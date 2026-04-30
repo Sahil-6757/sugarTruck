@@ -1,0 +1,33 @@
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .logo {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+.role {
+    background: #e6f4ea;
+    color: #166534;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  
+  .logout {
+    cursor: pointer;
+    color: white !important;
+    background-color: red;
+    padding:4px;
+    border-radius: 5px;
+  }
+
+  .logout:hover{
+  }
