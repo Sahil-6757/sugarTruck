@@ -6,8 +6,8 @@ import Cropdetails from './components/Cropdetails';
 import Delivery from './components/Delivery';
 import Farmeradminpanel from './components/Farmeradminpanel';
 import Field from './components/Field';
-import Driver from './components/Driver'
-import Trip from './components/Trip'
+import Driver from './components/Driver';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -15,13 +15,36 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/farmer" element={<Farmer />} />
-        <Route path='/crop-detail' element={<Cropdetails/>}/>
-        <Route path='/delivery' element={<Delivery/>}/>
-        <Route path="/farmer-admin-panel" element={<Farmeradminpanel/>}/>
-        <Route path='/field' element={<Field/>}/>
-        <Route path='/driver' element={<Driver/>}/>
-        <Route path='/trip' element={<Trip/>}/>
+        <Route path="/farmer" element={
+          <ProtectedRoute>
+            <Farmer />
+          </ProtectedRoute>
+        } />
+        <Route path='/crop-detail' element={
+          <ProtectedRoute>
+            <Cropdetails />
+          </ProtectedRoute>
+        }/>
+        <Route path='/delivery' element={
+          <ProtectedRoute>
+            <Delivery />
+          </ProtectedRoute>
+        }/>
+        <Route path="/farmer-admin-panel" element={
+          <ProtectedRoute>
+            <Farmeradminpanel />
+          </ProtectedRoute>
+        }/>
+        <Route path='/field' element={
+          <ProtectedRoute>
+            <Field />
+          </ProtectedRoute>
+        }/>
+        <Route path='/driver' element={
+          <ProtectedRoute>
+            <Driver />
+          </ProtectedRoute>
+        }/>
       </Routes>
     </div>
   );

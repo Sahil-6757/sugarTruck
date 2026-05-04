@@ -242,6 +242,8 @@ app.post('/login', async (req, res) => {
             [value, role]
         );
 
+        
+
         if (!rows.length) {
             return res.status(401).send('Invalid login details');
         }
@@ -250,7 +252,7 @@ app.post('/login', async (req, res) => {
             return res.status(401).send('Invalid email or password');
         }
 
-        return res.send('Login successful');
+        return res.json(rows[0]);
     } catch (error) {
         console.error('Login failed:', error);
         return res.status(500).send('Unable to login');

@@ -142,8 +142,21 @@ const Auth = () => {
     axios
       .post(`http://localhost:8000${endpoint}`, payload)
       .then((response) => {
-        alert(response.data || `${tab.toUpperCase()} SUCCESS`);
-        navigation("/farmer");
+        console.log(response.data);
+        const user = response.data;
+        localStorage.setItem('user', JSON.stringify(user));
+        if(user.role ==="Farmer"){
+          navigation("/farmer");
+        }
+        else if(user.role ==="Factory Admin"){
+          navigation("/farmer-admin-panel");
+        }
+        else if(user.role ==="Field Staff"){
+          navigation("/field");
+        }
+        else if(user.role ==="Driver"){
+          navigation("/driver");
+        }
       })
       .catch((error) => {
         alert(error?.response?.data || "Request failed");

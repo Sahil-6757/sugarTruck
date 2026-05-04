@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Users, MapPin, Clock, CheckCircle, Phone, Eye,
-   Truck, FileText, AlertTriangle, Home } from "lucide-react";
+import {  MapPin, Clock, CheckCircle, Phone, Eye,
+    FileText, AlertTriangle, Home, 
+    Clock1,
+    Users} from "lucide-react";
 import Navbar from "./Navbar";
 import '../css/field.css'
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 
 function Field() {
@@ -105,19 +105,19 @@ function Field() {
       title: "Assigned Farmers",
       value: 12,
       sub: "",
-      icon: "👥",
+      icon: <Users />,
     },
     {
       title: "Field Visits",
       value: 8,
       sub: "This week",
-      icon: "📍",
+      icon: <MapPin />,
     },
     {
       title: "Pending Tasks",
       value: 5,
       sub: "Requires attention",
-      icon: "🕒",
+      icon: <Clock1 />,
       highlight: true,
     },
     {
@@ -214,11 +214,11 @@ function Field() {
                       <CheckCircle size={12} style={{display:'inline', marginRight:4}} /> {farmer.status}
                     </span>
 
-                    <button className="fm-btn fm-btn-outline">
+                    <button className="fm-btn fm-btn-outline buttonHover">
                       <Phone size={14} style={{display:'inline', marginRight:4}} /> Call
                     </button>
 
-                    <button className="fm-btn fm-btn-primary" onClick={handleOpen}>
+                    <button className="fm-btn fm-btn-primary buttonHover" onClick={handleOpen}>
                       <Eye size={14} style={{display:'inline', marginRight:4}} /> Visit & Verify
                     </button>
                   </div>
@@ -252,7 +252,7 @@ function Field() {
                     <span className={`fm-badge fm-${d.statusType}`}>
                       {d.status}
                     </span>
-                    <button className="fm-btn fm-btn-outline">
+                    <button className="fm-btn fm-btn-outline buttonHover">
                       <MapPin size={14} style={{display:'inline', marginRight:4}} /> Track
                     </button>
                     <button className="fm-btn fm-btn-primary" onClick={handleOpen}>
@@ -286,16 +286,16 @@ function Field() {
               <div className="fm-report-card">
                 <h2 className="fm-title">Quick Actions</h2>
                 <div className="fm-quick-actions">
-                  <button className="fm-btn fm-btn-outline fm-full">
+                  <button className="fm-btn fm-btn-outline fm-full buttonHover">
                     <FileText size={14} style={{display:'inline', marginRight:4}} /> Upload Field Photos
                   </button>
-                  <button className="fm-btn fm-btn-outline fm-full">
+                  <button className="fm-btn fm-btn-outline fm-full buttonHover">
                     <AlertTriangle size={14} style={{display:'inline', marginRight:4}} /> Report Issue
                   </button>
-                  <button className="fm-btn fm-btn-outline fm-full">
+                  <button className="fm-btn fm-btn-outline fm-full buttonHover">
                     <MapPin size={14} style={{display:'inline', marginRight:4}} /> Update Location
                   </button>
-                  <button className="fm-btn fm-btn-outline fm-full">
+                  <button className="fm-btn fm-btn-outline fm-full buttonHover">
                     <Phone size={14} style={{display:'inline', marginRight:4}} /> Emergency Contact
                   </button>
                 </div>

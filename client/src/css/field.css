@@ -5,6 +5,10 @@
   background: #f8fafc;
 }
 
+.buttonHover:hover{
+  background: #edbc29;
+}
+
 /* Header */
 .fsd-header {
   display: flex;

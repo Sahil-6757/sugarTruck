@@ -180,7 +180,7 @@ function Farmer() {
                       {/* HEADER */}
                       <div className="modal-header">
                         <div>
-                          <h2 className='text-center'>🌱 New Crop Nodani Entry</h2>
+                          <h2 className='text-center'>New Crop Nodani Entry</h2>
                           <p className='text-center'>Register a new sugarcane crop for tracking</p>
                         </div>
                       </div>
@@ -304,15 +304,13 @@ function Farmer() {
 
                       {/* HEADER */}
                       <div className="modal-header">
-                        <h2>💬 Delivery Feedback</h2>
-                        <FaTimes className="close" onClick={handleCloseRate} />
+                        <h2>Delivery Feedback</h2>
+                        {/* <FaTimes className="close" onClick={handleCloseRate} /> */}
                       </div>
 
                       {/* DELIVERY INFO */}
                       <div className="delivery-info">
-                        <div className="icon">
-                          <FaTruck />
-                        </div>
+                       
                         <div>
                           <p className="title">Delivery DEL-0001</p>
                           <p className="sub">Driver: Rajesh Kumar</p>

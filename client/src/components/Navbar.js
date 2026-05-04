@@ -1,19 +1,23 @@
 import React from 'react'
 import '../css/navbar.css'
 import { useNavigate } from 'react-router-dom';
+
+import { FaSignOutAlt } from 'react-icons/fa';
 function Navbar() {
   const navigation = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user'));
   const handleLogout = ()=>{
-    navigation('/auth')
+    localStorage.removeItem('user');
+    navigation('/auth');
   }
   return (
     <div className="topbar">
     <div className="logo">
       🌱 <span>SugarTrack</span>
-      <span className="role">Farmer</span>
+      {user && <span className="role">{user.role}</span>}
     </div>
 
-    <div className="logout" onClick={handleLogout}>Logout</div>
+    <div className="logout" onClick={handleLogout}><FaSignOutAlt /> Logout</div>
   </div>
   )
 }

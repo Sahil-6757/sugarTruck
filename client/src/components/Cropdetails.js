@@ -145,16 +145,16 @@ function Cropdetails() {
       <div className="loc-row">
         <FaMapMarkerAlt />
         <span>{data.location}</span>
-        <button style={{width:"auto"}} className="map-btn">View on Map</button>
+        <button style={{width:"auto"}} className="map-btn buttonHover">View on Map</button>
       </div>
     </div>
 
     {/* ACTIONS */}
     <div className="actions">
-      <button className="primary">
+      <button className="primary buttonHover">
         <FaCamera /> Add Photos
       </button>
-      <button className="secondary">
+      <button className="secondary buttonHover">
         <FaCalendarAlt /> Update Status
       </button>
     </div>
@@ -247,7 +247,7 @@ function Cropdetails() {
               {task.priority}
             </span>
 
-            <button onClick={() => markDone(task.id)}>
+            <button className="buttonHover" onClick={() => markDone(task.id)}>
               Mark Done
             </button>
           </div>
