@@ -285,3 +285,7 @@ button {
   background: white;
   cursor: pointer;
 }
+
+.buttonHover:hover{
+  background: #edbc29;
+}

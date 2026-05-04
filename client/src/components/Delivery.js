@@ -134,16 +134,16 @@ function Delivery() {
               <p className="small">Last updated: 1:45 PM</p>
             </div>
 
-            <button className="map-btn" style={{height:'2rem',width:"auto"}}>
+            <button className="map-btn buttonHover" style={{height:'2rem',width:"auto"}}>
               <FaMapMarkerAlt /> Live Map
             </button>
           </div>
 
           {/* ACTIONS */}
           <div className="actions">
-            <button><FaPhone /> Call Rajesh</button>
-            <button><FaComment /> Message</button>
-            <button><FaExclamationCircle /> Report Issue</button>
+            <button className="buttonHover"><FaPhone /> Call Rajesh</button>
+            <button className="buttonHover"><FaComment /> Message</button>
+            <button className="buttonHover"><FaExclamationCircle /> Report Issue</button>
           </div>
         </div>
 
@@ -168,7 +168,7 @@ function Delivery() {
             <p>Contact <strong>{data.driver.phone}</strong></p>
             <p>Speciality <strong>{data.driver.type}</strong></p>
 
-            <button className="call-btn">
+            <button className="call-btn buttonHover">
               <FaPhone /> Call Rajesh
             </button>
           </div>
@@ -219,7 +219,7 @@ function Delivery() {
       <h3>Pickup Verification</h3>
       <p className="big">✔ OTP Verified Successfully</p>
       <h2>1234</h2>
-      <button>View Pickup Photos</button>
+      <button className="buttonHover">View Pickup Photos</button>
     </div>
 
     {/* PAYMENT */}
@@ -235,9 +235,9 @@ function Delivery() {
     {/* HELP */}
     <div className="card">
       <h3>Need Help?</h3>
-      <button><FaExclamationCircle /> Report Delivery Issue</button>
-      <button><FaPhone /> Contact Factory Support</button>
-      <button><FaComments /> Chat with Admin</button>
+      <button className="buttonHover"><FaExclamationCircle /> Report Delivery Issue</button>
+      <button className="buttonHover"><FaPhone /> Contact Factory Support</button>
+      <button className="buttonHover"><FaComments /> Chat with Admin</button>
     </div>
 
   </div>

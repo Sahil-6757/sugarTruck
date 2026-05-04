@@ -1,0 +1,253 @@
+.drvDash_container {
+  padding: 20px 30px;
+  background-color: #f5f7f6;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.drvDash_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.drvDash_title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e2d2f;
+  margin: 0;
+}
+
+.drvDash_subtitle {
+  margin-top: 5px;
+  color: #6b7c7d;
+}
+
+.drvDash_vehicle {
+  text-align: right;
+}
+
+.drvDash_vehicleLabel {
+  display: block;
+  font-size: 14px;
+  color: #6b7c7d;
+}
+
+.drvDash_vehicleNumber {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e2d2f;
+}
+
+/* Cards */
+.drvDash_cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.drvDash_card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e0e5e4;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease;
+}
+
+.drvDash_card:hover {
+  transform: translateY(-3px);
+}
+
+.drvDash_cardTitle {
+  font-size: 14px;
+  color: #6b7c7d;
+  margin: 0;
+}
+
+.drvDash_cardValue {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 6px;
+  color: #1e2d2f;
+}
+
+.drvDash_icon {
+  font-size: 26px;
+  color: #2e7d32;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .drvDash_cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .drvDash_cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.drvAssign_container {
+  padding: 20px;
+  background: #f4f7f5;
+  font-family: Arial, sans-serif;
+}
+
+/* Section */
+.drvAssign_section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #dce5e2;
+}
+
+.drvAssign_title {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+/* Cards */
+.drvAssign_card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #e2e8e6;
+  margin-bottom: 15px;
+  background: #f9fbfa;
+}
+
+/* Left */
+.drvAssign_left {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.drvAssign_iconCircle {
+  background: #2e7d32;
+  color: #fff;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drvAssign_tripId {
+  margin: 0;
+  font-size: 16px;
+}
+
+.drvAssign_info {
+  margin: 3px 0;
+  color: #5f6f6c;
+  font-size: 14px;
+}
+
+.drvAssign_meta {
+  margin-left: 10px;
+  font-size: 13px;
+  color: #7b8c89;
+}
+
+.drvAssign_subInfo {
+  font-size: 14px;
+}
+
+/* Right */
+.drvAssign_right {
+  text-align: right;
+}
+
+.drvAssign_badgeAssigned {
+  background: #2d9cdb;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.drvAssign_badgeAvailable {
+  background: #e6f4ea;
+  color: #2e7d32;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.drvAssign_time {
+  font-size: 12px;
+  margin: 6px 0;
+  color: #6b7c7d;
+}
+
+.drvAssign_btnPrimary {
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.drvAssign_btnSecondary {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Bottom Actions */
+.drvAssign_actions {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.drvAssign_actionCard {
+  background: #fff;
+  border: 1px solid #dce5e2;
+  border-radius: 12px;
+  text-align: center;
+  padding: 20px;
+}
+
+.drvAssign_actionIcon {
+  font-size: 28px;
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+.drvAssign_actionBtn {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #f5f7f6;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .drvAssign_actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.buttonHover:hover{
+  background: #edbc29 !important;
+}

@@ -19,6 +19,10 @@
   color: #6b7280;
   font-size: 14px;
 }
+.monthly-p{
+  display: flex;
+  justify-content: space-between;
+}
 
 /* ACTIONS */
 .actions {
@@ -197,11 +201,8 @@
 .rank {
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-content: center;
   justify-content: space-between;
+  margin-top: 12px;
 }
 
 .rank span {
@@ -226,4 +227,365 @@
 }
 .green {
   color: green;
+}/* Container */
+.fw-modal {
+  width: 30%;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 40px auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.fw-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.fw-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.fw-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Delivery Card */
+.fw-delivery-card {
+  display: flex;
+  gap: 12px;
+  background: #eef6fb;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.fw-delivery-id {
+  font-weight: 600;
+}
+
+.fw-delivery-meta {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Section */
+.fw-section {
+  background: #fafafa;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.fw-section-title {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Labels */
+.fw-label {
+  display: block;
+  font-size: 14px;
+  margin: 10px 0 6px;
+}
+
+.fw-label span {
+  color: red;
+}
+
+/* Inputs */
+.fw-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+}
+
+.fw-input-active {
+  border: 2px solid #4caf50;
+}
+
+/* Button */
+.fw-confirm-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: #7da77d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.fw-confirm-btn:hover {
+  background: #6c946c;
+}
+
+/* Container */
+.fr-container {
+  font-family: Arial, sans-serif;
+}
+
+/* Stepper */
+.fr-stepper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.fr-step-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fr-step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.fr-step-circle.fr-active {
+  background: #2e7d32;
+  color: white;
+}
+
+.fr-step-label {
+  font-size: 14px;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.fr-active-text {
+  color: #1f2937;
+}
+
+.fr-step-line {
+  width: 40px;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 0 10px;
+}
+
+.fr-line-active {
+  background: #2e7d32;
+}
+
+/* Form Box */
+.fr-form-box {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+/* Fields */
+.fr-field {
+  margin-bottom: 16px;
+}
+
+.fr-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.fr-field span {
+  color: red;
+}
+
+.fr-field input {
+  width: 100%;
+  height: 44px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Mobile Row */
+.fr-mobile-row {
+  display: flex;
+  gap: 8px;
+}
+
+.fr-prefix {
+  width: 60px !important;
+  background: #f1f5f9;
+}
+
+/* Grid */
+.fr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.fr-full {
+  grid-column: span 2;
+}
+
+/* Section title */
+.fr-section-title {
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Buttons */
+.fr-btn {
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.fr-btn-green {
+  background: #2e7d32;
+  color: white;
+}
+
+.fr-btn-green:hover {
+  background: #1b5e20;
+}
+
+.fr-btn-outline {
+  border: 1px solid #d1d5db;
+  background: white;
+}
+
+/* Footer */
+.fr-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.buttonHover:hover{
+  background: #edbc29;
+  color: white;
+}
+
+.drvAssignStaff_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+.drvAssignStaff_modal {
+  width: 420px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.drvAssignStaff_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.drvAssignStaff_titleWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drvAssignStaff_icon {
+  color: #2e7d32;
+}
+
+.drvAssignStaff_close {
+  cursor: pointer;
+}
+
+/* Info Box */
+.drvAssignStaff_infoBox {
+  display: flex;
+  justify-content: space-between;
+  background: #eef5ef;
+  border: 1px solid #c8e6c9;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.drvAssignStaff_label {
+  font-size: 12px;
+  color: #6b7c7d;
+}
+
+.drvAssignStaff_value {
+  margin: 2px 0 0;
+  color: #1b5e20;
+}
+
+/* Field */
+.drvAssignStaff_field label {
+  font-size: 14px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.drvAssignStaff_field span {
+  color: red;
+}
+
+.drvAssignStaff_select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #2e7d32;
+  outline: none;
+  margin-bottom: 15px;
+}
+
+/* Button */
+.drvAssignStaff_btn {
+  width: 100%;
+  background: #7da77f;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.drvAssignStaff_btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

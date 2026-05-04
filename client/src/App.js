@@ -6,6 +6,8 @@ import Cropdetails from './components/Cropdetails';
 import Delivery from './components/Delivery';
 import Farmeradminpanel from './components/Farmeradminpanel';
 import Field from './components/Field';
+import Driver from './components/Driver'
+import Trip from './components/Trip'
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path='/delivery' element={<Delivery/>}/>
         <Route path="/farmer-admin-panel" element={<Farmeradminpanel/>}/>
         <Route path='/field' element={<Field/>}/>
+        <Route path='/driver' element={<Driver/>}/>
+        <Route path='/trip' element={<Trip/>}/>
       </Routes>
     </div>
   );

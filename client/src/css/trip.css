@@ -1,0 +1,190 @@
+.drvTrip_container {
+  padding: 20px;
+  background: #f4f7f5;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.drvTrip_header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.drvTrip_headerIcon {
+  color: #2e7d32;
+  font-size: 20px;
+}
+
+/* Cards */
+.drvTrip_card {
+  background: #fff;
+  border: 1px solid #dce5e2;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.drvTrip_cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drvTrip_callBtn {
+  background: #f5f7f6;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Farmer */
+.drvTrip_farmerDetails h3 {
+  margin: 10px 0 5px;
+}
+
+.drvTrip_farmerDetails p {
+  color: #6b7c7d;
+}
+
+/* Navigation */
+.drvTrip_navigationBox {
+  background: #fdf6e3;
+  border: 1px solid #e6d3a3;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.drvTrip_navActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.buttonHover:hover{
+  background: #edbc29 !important;
+}
+
+.drvTrip_navBtn {
+  flex: 1;
+  background: #1b5e20;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.drvTrip_mapBtn {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* OTP */
+.drvTrip_otpRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.drvTrip_otpInput {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.drvTrip_verifyBtn {
+  background: #81c784;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .drvTrip_navActions {
+    flex-direction: column;
+  }
+
+  .drvTrip_otpRow {
+    flex-direction: column;
+  }
+}
+
+.drvDoc_container {
+  margin-top: -40px;
+  padding: 20px;
+  background: #f4f7f5;
+  font-family: Arial, sans-serif;
+}
+
+/* Section */
+.drvDoc_section {
+  margin-bottom: 20px;
+}
+
+.drvDoc_title {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+/* Grid */
+.drvDoc_grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.drvDoc_item {
+  justify-content: center;
+  background: #fff;
+  border: 1px solid #dce5e2;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.drvDoc_item:hover {
+  background: #f0f5f3;
+}
+
+/* Destination */
+.drvDoc_destination {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.drvDoc_destination h3 {
+  margin-bottom: 10px;
+  color: #1b5e20;
+}
+
+.drvDoc_info p {
+  margin: 6px 0;
+  color: #2e7d32;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .drvDoc_grid {
+    grid-template-columns: 1fr;
+  }
+}

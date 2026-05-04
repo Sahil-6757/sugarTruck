@@ -164,7 +164,7 @@ function Farmer() {
             </div>
 
             <div className="actions">
-              <button className="primary" onClick={handleOpen}>
+              <button className="primary buttonHover" onClick={handleOpen}>
                 <FaPlus /> Add New Crop
               </button>
               <Modal
@@ -373,7 +373,7 @@ function Farmer() {
                   </div>
                 </Box>
               </Modal>
-              <button className="secondary" onClick={handleOpenRate}>Rate Delivery</button>
+              <button className="secondary buttonHover" onClick={handleOpenRate}>Rate Delivery</button>
             </div>
           </div>
 
@@ -500,11 +500,11 @@ function Farmer() {
 
             {/* ACTIONS */}
             <div className="actions">
-              <button className="secondary">
+              <button className="secondary buttonHover">
                 <FaMapMarkerAlt /> View Location
               </button>
 
-              <button onClick={handleopenHarvest} className="primary">
+              <button onClick={handleopenHarvest} style={{background:"green",color:'white'}} className="primary ">
                 {data.progress === 100 ? "Harvest Ready" : "Update Status"}
               </button>
             </div>
