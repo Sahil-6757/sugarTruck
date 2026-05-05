@@ -388,6 +388,7 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
                       value={form.mobileNumber}
                       onChange={handleChange}
                       placeholder="9876543210"
+                      maxLength={10}
                     />
                     <button className="fr-btn fr-btn-green">
                       Send OTP
@@ -402,6 +403,7 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
                   <input
                     name="aadhaarNumber"
                     value={form.aadhaarNumber}
+                    maxLength={12}
                     onChange={handleChange}
                     placeholder="XXXX XXXX XXXX"
                   />
@@ -439,7 +441,7 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
 
                   <div className="fr-field fr-full">
                     <label>PIN Code <span>*</span></label>
-                    <input name="pinCode" value={form.pinCode} onChange={handleChange} placeholder="6-digit PIN code" />
+                    <input name="pinCode" value={form.pinCode} maxLength={6} onChange={handleChange} placeholder="6-digit PIN code" />
                   </div>
                 </div>
               </div>

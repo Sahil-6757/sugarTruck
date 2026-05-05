@@ -199,14 +199,11 @@
 }
 
 /* REMINDERS */
-.reminders {
-  margin-top: 15px;
-}
+
 
 .reminder-grid {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
   text-align: center;
 }
 

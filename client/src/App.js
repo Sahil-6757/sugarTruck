@@ -7,6 +7,7 @@ import Delivery from './components/Delivery';
 import Farmeradminpanel from './components/Farmeradminpanel';
 import Field from './components/Field';
 import Driver from './components/Driver';
+import Trip from './components/Trip'
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
         <Route path='/driver' element={
           <ProtectedRoute>
             <Driver />
+            <Trip/>
           </ProtectedRoute>
         }/>
       </Routes>

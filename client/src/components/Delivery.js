@@ -235,8 +235,8 @@ function Delivery() {
     {/* HELP */}
     <div className="card">
       <h3>Need Help?</h3>
-      <button className="buttonHover"><FaExclamationCircle /> Report Delivery Issue</button>
-      <button className="buttonHover"><FaPhone /> Contact Factory Support</button>
+      <button className="buttonHover "><FaExclamationCircle /> Report Delivery Issue</button>
+      <button className="buttonHover "><FaPhone /> Contact Factory Support</button>
       <button className="buttonHover"><FaComments /> Chat with Admin</button>
     </div>
 
