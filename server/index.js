@@ -104,6 +104,19 @@ async function ensureDatabaseAndTables() {
 `);
 
     await pool.query(`
+    CREATE TABLE IF NOT EXISTS drivers (
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        phone VARCHAR(20) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        address VARCHAR(255) NOT NULL,
+        vehicle VARCHAR(255) NOT NULL,
+        vehicle_number VARCHAR(255) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+` );
+
+    await pool.query(`
     CREATE TABLE IF NOT EXISTS nodani (
         id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 
@@ -160,6 +173,22 @@ async function ensureDatabaseAndTables() {
 
     if (!nodIdColumnRows.length) {
         await pool.query(`ALTER TABLE nodani ADD COLUMN nod_id VARCHAR(50) NULL AFTER id`);
+    }
+
+    const [driverVehNumColumnRows] = await pool.query(
+        `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'drivers'
+        AND COLUMN_NAME = 'vehicle_number'
+        LIMIT 1
+        `,
+        [DB_NAME]
+    );
+
+    if (!driverVehNumColumnRows.length) {
+        await pool.query(`ALTER TABLE drivers ADD COLUMN vehicle_number VARCHAR(255) NULL AFTER vehicle`);
     }
 }
 
@@ -312,6 +341,52 @@ app.post('/addCrops', async (req, res) => {
     }
 });
 
+app.get('/getDrivers', async (req, res) => {
+    try {
+        const email = req.query.email;
+
+        // 🔴 Check if email is missing
+        if (!email) {
+            return res.status(400).json({
+                message: "Email is required"
+            });
+        }
+
+        console.log("Incoming email:", email);
+
+        const [rows] = await pool.query(
+            `SELECT * FROM drivers WHERE email = ?`,
+            [email.trim()] // ✅ remove accidental spaces
+        );
+
+        console.log("DB Result:", rows);
+
+        res.json(rows);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+app.post('/add-driver', async (req, res) => {
+    try {
+        const { name, phone, email, address, vehicle, vehicle_number } = req.body;
+        const sql = `
+            INSERT INTO drivers (name, phone, email, address, vehicle, vehicle_number)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `;
+        await pool.query(sql, [name, phone, email, address, vehicle, vehicle_number]);
+        res.status(201).json({
+            message: "Driver added successfully"
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+})
+
 app.get('/getCrops', async (req, res) => {
 
     try {
@@ -321,31 +396,22 @@ app.get('/getCrops', async (req, res) => {
         );
 
         res.json(rows);
-        console.log("crops data", rows);
 
     } catch (err) {
-
         console.log(err);
-
         res.status(500).json({
             message: "Server Error"
         });
-
     }
-
 });
 
 app.delete('/deleteCrop/:id', async (req, res) => {
-
     try {
-
         const id = req.params.id;
-
         await pool.query(
             `DELETE FROM crops WHERE id = ?`,
             [id]
         );
-
         const [allCrops] = await pool.query(
             `SELECT * FROM crops ORDER BY id DESC`
         );

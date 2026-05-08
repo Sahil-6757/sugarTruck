@@ -145,16 +145,16 @@ const Auth = () => {
         console.log(response.data);
         const user = response.data;
         localStorage.setItem('user', JSON.stringify(user));
-        if(user.role ==="Farmer"){
+        if (user.role === "Farmer") {
           navigation("/farmer");
         }
-        else if(user.role ==="Factory Admin"){
+        else if (user.role === "Factory Admin") {
           navigation("/farmer-admin-panel");
         }
-        else if(user.role ==="Field Staff"){
+        else if (user.role === "Field Staff") {
           navigation("/field");
         }
-        else if(user.role ==="Driver"){
+        else if (user.role === "Driver") {
           navigation("/driver");
         }
       })
@@ -201,9 +201,9 @@ const Auth = () => {
                   className={`role-card ${role === r.name ? "selected" : ""}`}
                   onClick={() => setRole(r.name)}
                 >
-                  <span style={{marginRight:5, display:"inline"}}>
+                  <span style={{ marginRight: 5, display: "inline" }}>
                     {r.icon}
-                    </span>
+                  </span>
                   <span>{r.name}</span>
                 </div>
               ))}
@@ -234,7 +234,7 @@ const Auth = () => {
             className={method === "otp" ? "active" : ""}
             onClick={() => setMethod("otp")}
           >
-            <FaPhone/> Mobile OTP
+            <FaPhone /> Mobile OTP
           </button>
           <button
             className={method === "email" ? "active" : ""}
