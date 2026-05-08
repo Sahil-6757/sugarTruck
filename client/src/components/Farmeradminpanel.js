@@ -103,7 +103,7 @@ const DispatchModal = ({ open, handleClose }) => {
             Select Farmer (Harvest Ready) <Box component="span" sx={{ color: '#ef4444' }}>*</Box>
           </Typography>
           <TextField
-            select
+            
             name="farmer"
             value={form.farmer}
             onChange={handleChange}
