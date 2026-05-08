@@ -95,6 +95,41 @@ async function ensureDatabaseAndTables() {
         )
     `);
 
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS crops (
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        crop_name VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`);
+
+    await pool.query(`
+    CREATE TABLE IF NOT EXISTS nodani (
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+
+        farmer_id INT,
+        farmer_name VARCHAR(255),
+
+        variety VARCHAR(255),
+        plantation_date DATE,
+        field_name VARCHAR(255),
+        area VARCHAR(50),
+        unit VARCHAR(50),
+        soil_type VARCHAR(100),
+        irrigation_method VARCHAR(100),
+        notes TEXT,
+        latitude VARCHAR(100),
+        longitude VARCHAR(100),
+        image LONGTEXT,
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`);
+
+
+
+
+
     const [passwordColumnRows] = await pool.query(
         `
         SELECT COLUMN_NAME
@@ -109,6 +144,22 @@ async function ensureDatabaseAndTables() {
 
     if (!passwordColumnRows.length) {
         await pool.query(`ALTER TABLE users ADD COLUMN password_hash VARCHAR(255) NULL AFTER email`);
+    }
+
+    const [nodIdColumnRows] = await pool.query(
+        `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'nodani'
+        AND COLUMN_NAME = 'nod_id'
+        LIMIT 1
+        `,
+        [DB_NAME]
+    );
+
+    if (!nodIdColumnRows.length) {
+        await pool.query(`ALTER TABLE nodani ADD COLUMN nod_id VARCHAR(50) NULL AFTER id`);
     }
 }
 
@@ -152,10 +203,10 @@ async function registerUser(req, res, fallbackRole) {
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER || "",
-      pass: process.env.EMAIL_PASS || "",
+        user: process.env.EMAIL_USER || "",
+        pass: process.env.EMAIL_PASS || "",
     },
-  });
+});
 
 app.post('/register-farmer', async (req, res) => registerUser(req, res, 'Farmer'));
 app.post('/register-factory', async (req, res) => registerUser(req, res, 'Factory Admin'));
@@ -218,6 +269,198 @@ app.post('/verify-email-otp', (req, res) => {
     return res.json({ message: 'Email verified successfully' });
 });
 
+app.post('/addCrops', async (req, res) => {
+    try {
+
+        const crops = req.body.crop;
+
+        if (!crops) {
+            return res.status(400).json({
+                message: "Crop is required"
+            });
+        }
+
+        // Insert crop
+        const insertSql = `
+            INSERT INTO crops (crop_name)
+            VALUES (?)
+        `;
+
+        await pool.query(insertSql, [crops]);
+
+        // Fetch all crops
+        const fetchSql = `
+            SELECT * FROM crops
+            ORDER BY id DESC
+        `;
+
+        const [allCrops] = await pool.query(fetchSql);
+
+        res.status(201).json({
+            message: "Crop added successfully",
+            crops: allCrops
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+});
+
+app.get('/getCrops', async (req, res) => {
+
+    try {
+
+        const [rows] = await pool.query(
+            `SELECT * FROM crops ORDER BY id DESC`
+        );
+
+        res.json(rows);
+        console.log("crops data", rows);
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+});
+
+app.delete('/deleteCrop/:id', async (req, res) => {
+
+    try {
+
+        const id = req.params.id;
+
+        await pool.query(
+            `DELETE FROM crops WHERE id = ?`,
+            [id]
+        );
+
+        const [allCrops] = await pool.query(
+            `SELECT * FROM crops ORDER BY id DESC`
+        );
+
+        res.json({
+            message: "Crop deleted successfully",
+            crops: allCrops
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+});
+
+app.post('/addNodani', async (req, res) => {
+
+    try {
+
+        const {
+            farmerId,
+            farmerName,
+
+            variety,
+            date,
+            fieldName,
+            area,
+            unit,
+            soil,
+            irrigation,
+            notes,
+            latitude,
+            longitude,
+            image
+        } = req.body;
+
+        const year = new Date().getFullYear();
+        const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        const nodId = `NOD-${year}-${randomNum}`;
+
+        const sql = `
+            INSERT INTO nodani (
+                nod_id,
+                farmer_id,
+                farmer_name,
+
+                variety,
+                plantation_date,
+                field_name,
+                area,
+                unit,
+                soil_type,
+                irrigation_method,
+                notes,
+                latitude,
+                longitude,
+                image
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const [result] = await pool.query(sql, [
+            nodId,
+            farmerId,
+            farmerName,
+
+            variety,
+            date,
+            fieldName,
+            area,
+            unit,
+            soil,
+            irrigation,
+            notes,
+            latitude,
+            longitude,
+            image
+        ]);
+
+        res.status(201).json({
+            message: "Nodani Added Successfully",
+            insertedId: result.insertId
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            message: "Server Error"
+        });
+
+    }
+
+});
+
+app.get('/getNodani/:farmerId', async (req, res) => {
+    try {
+        const { farmerId } = req.params;
+        const [rows] = await pool.query(
+            `SELECT * FROM nodani WHERE farmer_id = ? ORDER BY id DESC`,
+            [farmerId]
+        );
+        res.json(rows);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 app.post('/login', async (req, res) => {
     try {
         const { phone, email, role, loginMethod, password } = req.body;
@@ -242,7 +485,7 @@ app.post('/login', async (req, res) => {
             [value, role]
         );
 
-        
+
 
         if (!rows.length) {
             return res.status(401).send('Invalid login details');

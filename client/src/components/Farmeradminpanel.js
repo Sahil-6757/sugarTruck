@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from './Navbar'
 import '../css/farmeradmin.css'
 import Box from '@mui/material/Box';
@@ -510,6 +510,10 @@ function Farmeradminpanel() {
   const [openAddFarmer, setOpenAddFarmer] = useState(false);
   const handleCloseAddFarmer = () => setOpenAddFarmer(false);
 
+  const [openAddcrops, setopenAddcrops] = useState(false);
+  const handleCloseAddcrops = () => setopenAddcrops(false);
+
+
   const [openRecord, setOpenRecord] = useState(false);
   const [AssignModalOpen, setAssignModalOpen] = useState(false);
 
@@ -518,6 +522,62 @@ function Farmeradminpanel() {
 
   const [tab, setTab] = useState("farmers");
   const [selectedStaff, setSelectedStaff] = useState("");
+
+  const [crops, setCrops] = useState("");
+  const [cropsData, setcropsData] = useState([])
+  const handleCrops = async () => {
+    if (!crops) {
+      alert("Enter Crop")
+    }
+    else {
+      try {
+        const response = await fetch("http://localhost:8000/addCrops", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ crop: crops })
+        });
+
+        const data = await response.json();
+        setcropsData(data.crops);
+        setCrops("")
+
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const handleDeleteCrop = async (id) => {
+
+    try {
+
+      const response = await fetch(`http://localhost:8000/deleteCrop/${id}`, {
+        method: "DELETE"
+      });
+
+      const data = await response.json();
+      setcropsData(data.crops);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAllCrops = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/getCrops");
+      const data = await response.json();
+      setcropsData(data);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getAllCrops();
+  }, []);
 
 
   const stats = [
@@ -599,6 +659,9 @@ function Farmeradminpanel() {
     },
   ];
 
+  const handleAddcrops = () => {
+    setopenAddcrops(true)
+  }
 
   const handleaddFarmer = () => {
     setOpenAddFarmer(true);
@@ -618,6 +681,12 @@ function Farmeradminpanel() {
           </div>
 
           <div className="actions">
+            <button className="btn buttonHover" onClick={handleAddcrops}>
+              <FaUserPlus /> Add Crops
+            </button>
+
+
+
             <button className="btn buttonHover" onClick={handleaddFarmer}>
               <FaUserPlus /> Add Farmer
             </button>
@@ -656,6 +725,7 @@ function Farmeradminpanel() {
 
         {/* TABS */}
         <div className="tabs">
+
           <button onClick={() => setTab("farmers")} className={tab === "farmers" ? "active" : ""}>
             Farmers & Crops
           </button>
@@ -887,6 +957,69 @@ function Farmeradminpanel() {
           </div>
         </Box>
       </Modal>
+
+      {/* Add crops model */}
+      <Modal
+        open={openAddcrops}
+        onClose={handleCloseAddcrops}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div className='addCrops-section'>
+            <input type='text' onChange={(e) => setCrops(e.target.value)} value={crops} placeholder='Enter crop' style={{ width: "80%", height: "32px", marginTop: "12px", marginRight: "5px" }} />
+            <button className='buttonHover' style={{ width: "20%" }} onClick={handleCrops}>Add crop</button>
+          </div>
+          <table
+            border="1"
+            cellPadding="10"
+            cellSpacing="0"
+            style={{
+              width: "100%",
+              marginTop: "20px",
+              textAlign: "center"
+            }}
+          >
+
+            <thead>
+              <tr>
+                <th>Crop Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {
+                cropsData?.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.crop_name}</td>
+
+                    <td>
+                      <button
+                        onClick={() => handleDeleteCrop(item.id)}
+                        style={{
+                          background: "red",
+                          color: "#fff",
+                          border: "none",
+                          padding: "5px 10px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+
+                  </tr>
+                ))
+              }
+
+            </tbody>
+
+          </table>
+        </Box>
+      </Modal>
+
     </div>
   )
 }

@@ -4,6 +4,11 @@
   font-family: sans-serif;
 }
 
+.addCrops-section{
+  display: flex;
+  justify-content: space-between;
+}
+
 /* HEADER */
 .admin-header {
   display: flex;
@@ -588,4 +593,8 @@
 .drvAssignStaff_btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.buttonHover:hover {
+  background: #edbc29;
 }

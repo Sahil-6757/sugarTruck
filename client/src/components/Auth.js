@@ -201,7 +201,9 @@ const Auth = () => {
                   className={`role-card ${role === r.name ? "selected" : ""}`}
                   onClick={() => setRole(r.name)}
                 >
-                  {r.icon}
+                  <span style={{marginRight:5, display:"inline"}}>
+                    {r.icon}
+                    </span>
                   <span>{r.name}</span>
                 </div>
               ))}

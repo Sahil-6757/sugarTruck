@@ -68,7 +68,7 @@ function Delivery() {
       status: "pending",
     },
   ];
-  
+
   const data = {
     deliveryId: "DEL-0001",
     crop: "NOD-2024-001 • CO-265 • 45 tons",
@@ -85,165 +85,165 @@ function Delivery() {
   };
   return (
     <>
-    <Navbar/>
-    <div className="tracking-page">
+      <Navbar />
+      <div className="tracking-page">
 
-      {/* HEADER */}
-      <div className="header">
-        <button className="back-btn" onClick={()=>navigation('/farmer')} style={{width:"auto"}}>
-          <FaArrowLeft /> Back
-        </button>
+        {/* HEADER */}
+        <div className="header">
+          <button className="back-btn" onClick={() => navigation('/farmer')} style={{ width: "auto" }}>
+            <FaArrowLeft /> Back
+          </button>
 
-        <div>
-          <h2>Live Delivery Tracking</h2>
-          <p>Track your sugarcane delivery in real-time</p>
-        </div>
-      </div>
-
-      <div className="grid">
-
-        {/* LEFT SIDE */}
-        <div className="card">
-
-          <div className="top">
-            <div>
-              <h3>Delivery #{data.deliveryId}</h3>
-              <p>{data.crop}</p>
-            </div>
-            <span className="status">In Transit</span>
-          </div>
-
-          {/* OVERALL PROGRESS */}
-          <p className="label">Overall Progress</p>
-          <div className="progress-bar">
-            <div style={{ width: `${data.progress}%` }}></div>
-          </div>
-
-          {/* JOURNEY */}
-          <p className="label">Journey Progress</p>
-          <div className="progress-bar">
-            <div style={{ width: `${data.journey}%` }}></div>
-          </div>
-
-          {/* LIVE STATUS BOX */}
-          <div className="live-box">
-            <div>
-              <p className="bold">🚚 Your order is on the way!</p>
-              <p>Near Sangli Highway, 15km from factory</p>
-              <p className="">15 km remaining • ETA: 2:30 PM</p>
-              <p className="small">Last updated: 1:45 PM</p>
-            </div>
-
-            <button className="map-btn buttonHover" style={{height:'2rem',width:"auto"}}>
-              <FaMapMarkerAlt /> Live Map
-            </button>
-          </div>
-
-          {/* ACTIONS */}
-          <div className="actions">
-            <button className="buttonHover"><FaPhone /> Call Rajesh</button>
-            <button className="buttonHover"><FaComment /> Message</button>
-            <button className="buttonHover"><FaExclamationCircle /> Report Issue</button>
+          <div>
+            <h2>Live Delivery Tracking</h2>
+            <p>Track your sugarcane delivery in real-time</p>
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
-        <div className="side">
+        <div className="grid">
 
-          {/* DRIVER */}
+          {/* LEFT SIDE */}
           <div className="card">
-            <h3>Your Driver</h3>
 
-            <div className="driver">
-              <div className="avatar">R</div>
-              <div>
-                <h4>{data.driver.name}</h4>
-                <p>
-                  <FaStar /> {data.driver.rating} ({data.driver.trips} trips)
-                </p>
-              </div>
-            </div>
-
-            <p>Truck Number <strong>{data.driver.truck}</strong></p>
-            <p>Contact <strong>{data.driver.phone}</strong></p>
-            <p>Speciality <strong>{data.driver.type}</strong></p>
-
-            <button className="call-btn buttonHover">
-              <FaPhone /> Call Rajesh
-            </button>
-          </div>
-
-          {/* PICKUP (placeholder) */}
-        
-
-        </div>
-
-      </div>
-    </div>
-    <div className="progress-page">
-
-<div className="grid">
-
-  {/* LEFT TIMELINE */}
-  <div className="card">
-    <h3>Step-by-Step Progress</h3>
-
-    <div className="timeline">
-      {steps.map((step, i) => (
-        <div className="timeline-item" key={i}>
-
-          <div className={`icon ${step.status}`}>
-            {step.status === "done" && <FaCheckCircle />}
-            {step.status === "active" && <FaTruck />}
-            {step.status === "pending" && <FaClock />}
-          </div>
-
-          <div style={{padding:"20px"}} className="content">
             <div className="top">
-              <h4>{step.title}</h4>
-              <span>{step.time}</span>
+              <div>
+                <h3>Delivery #{data.deliveryId}</h3>
+                <p>{data.crop}</p>
+              </div>
+              <span className="status">In Transit</span>
             </div>
-            <p>{step.desc}</p>
+
+            {/* OVERALL PROGRESS */}
+            <p className="label">Overall Progress</p>
+            <div className="progress-bar">
+              <div style={{ width: `${data.progress}%` }}></div>
+            </div>
+
+            {/* JOURNEY */}
+            <p className="label">Journey Progress</p>
+            <div className="progress-bar">
+              <div style={{ width: `${data.journey}%` }}></div>
+            </div>
+
+            {/* LIVE STATUS BOX */}
+            <div className="live-box">
+              <div>
+                <p className="bold"> Your order is on the way!</p>
+                <p>Near Sangli Highway, 15km from factory</p>
+                <p className="">15 km remaining • ETA: 2:30 PM</p>
+                <p className="small">Last updated: 1:45 PM</p>
+              </div>
+
+              <button className="map-btn buttonHover" style={{ height: '2rem', width: "auto" }}>
+                <FaMapMarkerAlt /> Live Map
+              </button>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="actions">
+              <button className="buttonHover"><FaPhone /> Call Rajesh</button>
+              <button className="buttonHover"><FaComment /> Message</button>
+              <button className="buttonHover"><FaExclamationCircle /> Report Issue</button>
+            </div>
+          </div>
+
+          {/* RIGHT SIDE */}
+          <div className="side">
+
+            {/* DRIVER */}
+            <div className="card">
+              <h3>Your Driver</h3>
+
+              <div className="driver">
+                <div className="avatar">R</div>
+                <div>
+                  <h4>{data.driver.name}</h4>
+                  <p>
+                    <FaStar /> {data.driver.rating} ({data.driver.trips} trips)
+                  </p>
+                </div>
+              </div>
+
+              <p>Truck Number <strong>{data.driver.truck}</strong></p>
+              <p>Contact <strong>{data.driver.phone}</strong></p>
+              <p>Speciality <strong>{data.driver.type}</strong></p>
+
+              <button className="call-btn buttonHover">
+                <FaPhone /> Call Rajesh
+              </button>
+            </div>
+
+            {/* PICKUP (placeholder) */}
+
+
           </div>
 
         </div>
-      ))}
-    </div>
-  </div>
+      </div>
+      <div className="progress-page">
 
-  {/* RIGHT SIDE */}
-  <div className="side">
+        <div className="grid">
 
-    {/* PICKUP */}
-    <div className="card success">
-      <h3>Pickup Verification</h3>
-      <p className="big">✔ OTP Verified Successfully</p>
-      <h2>1234</h2>
-      <button className="buttonHover">View Pickup Photos</button>
-    </div>
+          {/* LEFT TIMELINE */}
+          <div className="card">
+            <h3>Step-by-Step Progress</h3>
 
-    {/* PAYMENT */}
-    <div className="card">
-      <h3>Expected Payment</h3>
-      <p>Estimated Weight <strong>45 tons</strong></p>
-      <p>Rate per Ton <strong>₹5,400</strong></p>
-      <p>Transport Charges <strong>-₹2,700</strong></p>
-      <hr />
-      <h3 className="">₹2,40,300</h3>
-    </div>
+            <div className="timeline">
+              {steps.map((step, i) => (
+                <div className="timeline-item" key={i}>
 
-    {/* HELP */}
-    <div className="card">
-      <h3>Need Help?</h3>
-      <button className="buttonHover "><FaExclamationCircle /> Report Delivery Issue</button>
-      <button className="buttonHover "><FaPhone /> Contact Factory Support</button>
-      <button className="buttonHover"><FaComments /> Chat with Admin</button>
-    </div>
+                  <div className={`icon ${step.status}`}>
+                    {step.status === "done" && <FaCheckCircle />}
+                    {step.status === "active" && <FaTruck />}
+                    {step.status === "pending" && <FaClock />}
+                  </div>
 
-  </div>
+                  <div style={{ padding: "20px" }} className="content">
+                    <div className="top">
+                      <h4>{step.title}</h4>
+                      <span>{step.time}</span>
+                    </div>
+                    <p>{step.desc}</p>
+                  </div>
 
-</div>
-</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT SIDE */}
+          <div className="side">
+
+            {/* PICKUP */}
+            <div className="card success">
+              <h3>Pickup Verification</h3>
+              <p className="big">✔ OTP Verified Successfully</p>
+              <h2>1234</h2>
+              <button className="buttonHover">View Pickup Photos</button>
+            </div>
+
+            {/* PAYMENT */}
+            <div className="card">
+              <h3>Expected Payment</h3>
+              <p>Estimated Weight <strong>45 tons</strong></p>
+              <p>Rate per Ton <strong>₹5,400</strong></p>
+              <p>Transport Charges <strong>-₹2,700</strong></p>
+              <hr />
+              <h3 className="">₹2,40,300</h3>
+            </div>
+
+            {/* HELP */}
+            <div className="card">
+              <h3>Need Help?</h3>
+              <button className="buttonHover card-btn"><FaExclamationCircle /> Report Delivery Issue</button>
+              <button className="buttonHover card-btn"><FaPhone /> Contact Factory Support</button>
+              <button className="buttonHover card-btn"><FaComments /> Chat with Admin</button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
     </>
   )
 }

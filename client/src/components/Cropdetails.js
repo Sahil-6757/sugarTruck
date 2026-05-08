@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React, { useState, useEffect } from 'react'
 import '../css/cropdetail.css'
 import { FaLeaf, FaMapMarkerAlt, FaCamera, FaCalendarAlt,FaCheckCircle,FaRegCircle, FaTint, FaBug } from "react-icons/fa";
 import { MdOutlineAccessTime } from "react-icons/md";
@@ -26,18 +26,56 @@ function Cropdetails() {
     },
   ];
   const [tasks, setTasks] = useState(initialTasks);
-  const data = {
-    name: "Field A - North Block",
-    cropId: 1,
-    date: "3/15/2024",
-    days: 160,
-    area: "2.5 acres",
-    variety: "CO 86032",
-    stage: "MATURE",
-    yield: "45 tons",
-    location: "16.7050° N, 74.2433° E",
-    progress: 67,
-  };
+  const [data, setData] = useState({
+    name: "Loading...",
+    cropId: "",
+    date: "",
+    days: 0,
+    area: "",
+    variety: "",
+    stage: "",
+    yield: "Pending",
+    location: "Not tagged",
+    progress: 0,
+  });
+
+  useEffect(() => {
+    const fetchFirstCrop = async () => {
+      try {
+        const getLogin = JSON.parse(localStorage.getItem("user"));
+        if (!getLogin || !getLogin.id) return;
+
+        const response = await fetch(`http://localhost:8000/getNodani/${getLogin.id}`);
+        const crops = await response.json();
+        
+        if (crops && crops.length > 0) {
+          const item = crops[0]; 
+          
+          const plantedDate = new Date(item.plantation_date);
+          const today = new Date();
+          const diffTime = Math.abs(today - plantedDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          let progress = Math.min(Math.round((diffDays / 365) * 100), 100);
+
+          setData({
+            name: item.field_name || "Unnamed Field",
+            cropId: item.nod_id || `NOD-${new Date(item.created_at).getFullYear()}-${item.id.toString().padStart(3, '0')}`,
+            date: plantedDate.toLocaleDateString(),
+            days: diffDays || 0,
+            area: `${item.area} ${item.unit}`,
+            variety: item.variety,
+            stage: progress >= 100 ? "READY FOR HARVEST" : "GROWING",
+            yield: "Pending",
+            location: item.latitude ? `${item.latitude}, ${item.longitude}` : "Not tagged",
+            progress: progress,
+          });
+        }
+      } catch(err) {
+        console.log(err);
+      }
+    };
+    fetchFirstCrop();
+  }, []);
   
 
   const timelineData = [

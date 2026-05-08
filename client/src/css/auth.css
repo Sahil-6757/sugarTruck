@@ -60,6 +60,7 @@
 .active {
   color: #1f7a29 !important;
   border: 1px solid #1f7a29 !important;
+  background-color: white !important;
 }
 
 .tabs button:first-child {
@@ -120,14 +121,18 @@
 .role-card.selected {
   border: 2px solid green;
 }
-
+.selected{
+  color: #1f7a29;
+}
 .method {
   display: flex;
   margin: 15px 0;
+  justify-content: space-around;
+  width: 100% ;
 }
 
 .method button {
-  flex: 1;
+  width: 48% !important;
   padding: 9px;
   border: none;
   cursor: pointer;

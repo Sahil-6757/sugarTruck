@@ -6,6 +6,10 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+.card-btn {
+  margin-right: 12px;
+}
+
 .logo {
   font-weight: bold;
   display: flex;
@@ -64,6 +68,14 @@
   padding: 20px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
+}
+
+.card p {
+  padding: 7px !important;
+}
+
+.driver h4 {
+  margin-top: 7px !important;
 }
 
 /* TOP */
@@ -136,13 +148,13 @@
 
 .actions button {
   flex: 1 1;
-    padding: 7px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: white;
-    width: 150px;
-    color: black;
-    justify-content: center;
+  padding: 7px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  width: 150px;
+  color: black;
+  justify-content: center;
 }
 
 /* DRIVER */
@@ -286,6 +298,6 @@ button {
   cursor: pointer;
 }
 
-.buttonHover:hover{
+.buttonHover:hover {
   background: #edbc29;
 }
