@@ -62,15 +62,12 @@
 }
 
 .stat-card {
-
-  margin: auto;
-  width: 70%;
+  height: 7rem;
   background: white;
   padding: 10px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
@@ -92,15 +89,20 @@
 .icon.green {
   color: #16a34a;
   font-size: 50px;
+  margin-right: 12px;
 }
 
 .icon.blue {
   color: #2563eb;
   font-size: 50px;
+  margin-right: 12px;
+
 }
 
 .icon.orange {
   color: #f59e0b;
+  margin-right: 12px;
+
   font-size: 50px;
 }
 

@@ -1,9 +1,10 @@
 import React, { useEffect, useEffectEvent, useState } from 'react'
 import {
   FaSeedling, FaMapMarkerAlt, FaTruck, FaDollarSign,
-  FaPlus, FaTimes, FaCheckCircle, FaUpload, FaStar, FaLeaf, FaExclamationTriangle
+  FaPlus, FaTimes, FaCheckCircle, FaUpload, FaStar, FaLeaf, FaExclamationTriangle,
+  FaTrash
 } from "react-icons/fa";
-
+import axios from "axios";
 import '../css/farmer.css'
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -108,17 +109,31 @@ function Farmer() {
     });
 
   };
-
   const getLocation = () => {
 
-    navigator.geolocation.getCurrentPosition((position) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
 
-      setLocation({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      });
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
 
-    });
+        console.log(latitude, longitude);
+
+        setLocation({
+          lat: latitude,
+          lng: longitude,
+        });
+
+      },
+      (error) => {
+        console.log(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
 
   };
 
@@ -137,6 +152,12 @@ function Farmer() {
   const handleSubmit = async () => {
 
     try {
+
+      if (!form.variety || !form.date || !form.fieldName || !form.area) {
+        alert("Please fill all required fields");
+        return;
+      }
+
 
       const user = JSON.parse(localStorage.getItem("user"));
 
@@ -212,6 +233,16 @@ function Farmer() {
       console.log(err);
     }
   };
+
+  const handleDelete = (e) => {
+    console.log(e)
+    axios.delete('http://localhost:8000/deleteNodani/' + e).then(res => {
+      getCropList()
+      getNodaniData(user.id)
+    }).catch(err => {
+      console.log(err)
+    })
+  }
 
 
   const [cropList, setCropList] = useState()
@@ -550,6 +581,9 @@ function Farmer() {
 
                   <span className={`status ${item.statusType}`}>
                     {item.status}
+                  </span>
+                  <span className='delete-btn'>
+                    <FaTrash color='red' onClick={() => handleDelete(item.id)} />
                   </span>
                 </div>
 

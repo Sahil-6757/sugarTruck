@@ -381,9 +381,6 @@ app.get("/getDrivers", async (req, res) => {
       `SELECT * FROM drivers WHERE email = ?`,
       [email.trim()], // ✅ remove accidental spaces
     );
-
-    console.log("DB Result:", rows);
-
     res.json(rows);
   } catch (error) {
     console.error("Error:", error);
@@ -410,6 +407,26 @@ app.post("/add-driver", async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
+
+app.delete('/deleteNodani/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await pool.query(`DELETE FROM nodani WHERE id = ?`, [id]);
+    const [allCrops] = await pool.query(`SELECT * FROM nodani ORDER BY id DESC`);
+
+    res.json({
+      message: "Nodani deleted successfully",
+      crops: allCrops,
+    });
+  } catch (err) {
+    console.log(err);
+
     res.status(500).json({
       message: "Server Error",
     });

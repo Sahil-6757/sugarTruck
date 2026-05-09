@@ -2,7 +2,14 @@
   font-family: sans-serif;
   background: #f5f7f5;
 }
-
+.delete-btn:hover{
+  color: brown !important;
+  cursor: pointer;
+}
+.delete-btn{
+  
+  font-size: 24px;
+}
 /* TOPBAR */
 .topbar {
   display: flex;
