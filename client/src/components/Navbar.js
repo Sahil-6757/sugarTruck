@@ -6,19 +6,19 @@ import { FaSignOutAlt } from 'react-icons/fa';
 function Navbar() {
   const navigation = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
-  const handleLogout = ()=>{
+  const handleLogout = () => {
     localStorage.removeItem('user');
     navigation('/auth');
   }
   return (
     <div className="topbar">
-    <div className="logo">
-      🌱 <span>SugarTrack</span>
-      {user && <span className="role">{user.role}</span>}
-    </div>
+      <div className="logo">
+        🌱 <span>SugarTrack</span>
+        {user && <span className="role">{user.role}</span>}
+      </div>
 
-    <div className="logout" onClick={handleLogout}><FaSignOutAlt /> Logout</div>
-  </div>
+      <div className="logout" onClick={handleLogout}><FaSignOutAlt /> Logout</div>
+    </div>
   )
 }
 

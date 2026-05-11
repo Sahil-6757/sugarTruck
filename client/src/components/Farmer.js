@@ -196,6 +196,45 @@ function Farmer() {
 
   };
 
+  const handleHarvestSubmit = async () => {
+    try {
+      if (!form.date) {
+        alert("Please select the expected harvest date");
+        return;
+      }
+
+      if (!selectedCrop || !selectedCrop.id) {
+        alert("No crop selected");
+        return;
+      }
+
+      const response = await fetch(`http://localhost:8000/declareHarvest/${selectedCrop.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          date: form.date,
+          yield: form.yield,
+          notes: form.notes
+        })
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      alert("Harvest Declaration Submitted Successfully");
+      setopenHarvest(false);
+      
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user && user.id) {
+        getNodaniData(user.id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [crops, setCrops] = useState([]);
 
   const getNodaniData = async (farmerId) => {
@@ -738,7 +777,7 @@ function Farmer() {
                     </div>
 
                     {/* BUTTON */}
-                    <button className="submit" onClick={handleSubmit}>
+                    <button className="submit" onClick={handleHarvestSubmit}>
                       <FaCheckCircle /> Confirm Harvest Ready
                     </button>
 

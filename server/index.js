@@ -131,6 +131,35 @@ async function ensureDatabaseAndTables() {
 `);
 
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS daily_reports (
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        staff_id INT,
+        staff_name VARCHAR(255),
+        report_date DATETIME,
+        farms_visited INT DEFAULT 0,
+        issues_reported INT DEFAULT 0,
+        deliveries_verified INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS deliveries (
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        farmer_id INT,
+        farmer_name VARCHAR(255),
+        driver_id INT,
+        driver_name VARCHAR(255),
+        vehicle_number VARCHAR(50),
+        weight VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'SCHEDULED',
+        delivery_date DATE,
+        delivery_time TIME,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS nodani (
         id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         farmer_id INT,
@@ -204,6 +233,56 @@ async function ensureDatabaseAndTables() {
     await pool.query(
       `ALTER TABLE drivers ADD COLUMN vehicle_number VARCHAR(255) NULL AFTER vehicle`,
     );
+  }
+
+  const [harvestDateColumnRows] = await pool.query(
+    `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'nodani'
+        AND COLUMN_NAME = 'expected_harvest_date'
+        LIMIT 1
+        `,
+    [DB_NAME],
+  );
+
+  if (!harvestDateColumnRows.length) {
+    await pool.query(
+      `ALTER TABLE nodani ADD COLUMN expected_harvest_date DATE NULL, ADD COLUMN estimated_yield VARCHAR(100) NULL, ADD COLUMN harvest_notes TEXT NULL, ADD COLUMN harvest_status VARCHAR(50) NULL DEFAULT 'pending'`
+    );
+  }
+
+  const [fieldStaffColumnRows] = await pool.query(
+    `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'nodani'
+        AND COLUMN_NAME = 'field_staff_id'
+        LIMIT 1
+        `,
+    [DB_NAME],
+  );
+
+  if (!fieldStaffColumnRows.length) {
+    await pool.query(`ALTER TABLE nodani ADD COLUMN field_staff_id INT NULL`);
+  }
+
+  const [verifiedLatColumnRows] = await pool.query(
+    `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'nodani'
+        AND COLUMN_NAME = 'verified_latitude'
+        LIMIT 1
+        `,
+    [DB_NAME],
+  );
+
+  if (!verifiedLatColumnRows.length) {
+    await pool.query(`ALTER TABLE nodani ADD COLUMN verified_latitude VARCHAR(100) NULL, ADD COLUMN verified_longitude VARCHAR(100) NULL, ADD COLUMN verification_condition VARCHAR(100) NULL, ADD COLUMN verification_notes TEXT NULL`);
   }
 }
 
@@ -387,6 +466,141 @@ app.get("/getDrivers", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+app.get("/getAllFarmers", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, name FROM users WHERE role = 'Farmer' ORDER BY name ASC`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.get("/getAllFieldStaff", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, name FROM users WHERE role = 'Field Staff' ORDER BY name ASC`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// --- FIELD STAFF: Submit Daily Report ---
+app.post("/staff/submitDailyReport", async (req, res) => {
+  try {
+    const {
+      staffId,
+      staffName,
+      date,
+      farmsVisited,
+      issuesReported,
+      deliveriesVerified
+    } = req.body;
+
+    // Convert ISO string date from frontend to MySQL DATETIME format if necessary, 
+    // or just store it directly if your MySQL handles ISO strings well.
+    const sql = `
+      INSERT INTO daily_reports (
+        staff_id, 
+        staff_name, 
+        report_date, 
+        farms_visited, 
+        issues_reported, 
+        deliveries_verified
+      ) VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await pool.query(sql, [
+      staffId,
+      staffName,
+      new Date(date), // Formats the JS date for the DB
+      farmsVisited,
+      issuesReported,
+      deliveriesVerified
+    ]);
+
+    res.status(201).json({
+      message: "Daily report submitted successfully",
+      reportId: result.insertId
+    });
+  } catch (error) {
+    console.error("Error submitting daily report:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// --- FACTORY ADMIN: Get All Daily Reports ---
+app.get("/admin/dailyReports", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT * FROM daily_reports ORDER BY report_date DESC`
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching daily reports:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.get("/getAllDrivers", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, name, vehicle, vehicle_number FROM drivers ORDER BY name ASC`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.post("/add-delivery", async (req, res) => {
+  try {
+    const { farmerId, farmerName, driverId, driverName, vehicleNumber, date, time } = req.body;
+    const sql = `
+      INSERT INTO deliveries (farmer_id, farmer_name, driver_id, driver_name, vehicle_number, delivery_date, delivery_time)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    await pool.query(sql, [farmerId, farmerName, driverId, driverName, vehicleNumber, date, time]);
+    res.status(201).json({ message: "Delivery added successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.get("/get-deliveries", async (req, res) => {
+  try {
+    const { staffId } = req.query;
+    let query = `SELECT d.* FROM deliveries d`;
+    let params = [];
+
+    if (staffId) {
+      // Join with nodani to find deliveries for farmers assigned to this staff
+      query = `
+        SELECT DISTINCT d.* 
+        FROM deliveries d
+        JOIN nodani n ON d.farmer_id = n.farmer_id
+        WHERE n.field_staff_id = ?
+      `;
+      params = [staffId];
+    }
+
+    const [rows] = await pool.query(query, params);
+    res.json(rows);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 app.post("/add-driver", async (req, res) => {
   try {
     const { name, phone, email, address, vehicle, vehicle_number } = req.body;
@@ -542,6 +756,26 @@ app.post("/addNodani", async (req, res) => {
   }
 });
 
+app.put("/declareHarvest/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date, yield: estimatedYield, notes } = req.body;
+
+    const sql = `
+      UPDATE nodani 
+      SET expected_harvest_date = ?, estimated_yield = ?, harvest_notes = ?, harvest_status = 'declared'
+      WHERE id = ?
+    `;
+
+    await pool.query(sql, [date, estimatedYield, notes, id]);
+
+    res.json({ message: "Harvest declaration submitted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 app.get("/getNodani/:farmerId", async (req, res) => {
   try {
     const { farmerId } = req.params;
@@ -552,6 +786,173 @@ app.get("/getNodani/:farmerId", async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.put("/assignStaff", async (req, res) => {
+  try {
+    const { farmer_id, staff_id } = req.body;
+    await pool.query(
+      `UPDATE nodani SET field_staff_id = ? WHERE farmer_id = ?`,
+      [staff_id, farmer_id]
+    );
+    res.json({ message: "Staff assigned successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.put("/submitVerification/:farmerId", async (req, res) => {
+  try {
+    const { farmerId } = req.params;
+    const { latitude, longitude, condition, notes } = req.body;
+
+    await pool.query(
+      `UPDATE nodani SET 
+        verified_latitude = ?, 
+        verified_longitude = ?, 
+        verification_condition = ?, 
+        verification_notes = ?, 
+        harvest_status = 'ready_for_delivery'
+       WHERE farmer_id = ?`,
+      [latitude, longitude, condition, notes, farmerId]
+    );
+
+    res.json({ message: "Verification submitted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.get("/staff/dashboard-stats", async (req, res) => {
+  try {
+    const { staffId } = req.query;
+
+    // Assigned Farmers count
+    const [farmerRows] = await pool.query(`
+      SELECT COUNT(DISTINCT farmer_id) as count FROM nodani WHERE field_staff_id = ?
+    `, [staffId]);
+    const assignedFarmers = farmerRows[0].count;
+
+    res.json({
+      assignedFarmers,
+      fieldVisits: 0,
+      pendingTasks: 0,
+      deliveriesAssisted: 0
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.get("/admin/dashboard-stats", async (req, res) => {
+  try {
+    const [farmerRows] = await pool.query(`SELECT COUNT(*) as count FROM users WHERE role = 'Farmer'`);
+    const totalFarmers = farmerRows[0].count;
+
+    const [cropRows] = await pool.query(`SELECT COUNT(*) as count FROM nodani`);
+    const activeCrops = cropRows[0].count;
+
+    const [deliveryRows] = await pool.query(`SELECT COUNT(*) as count FROM deliveries WHERE status != 'COMPLETED'`);
+    const pendingDeliveries = deliveryRows[0].count;
+
+    res.json({
+      totalFarmers,
+      activeCrops,
+      pendingDeliveries,
+      monthlyRevenue: "₹0.0L"
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.get("/admin/farmers", async (req, res) => {
+  try {
+    const { staffId } = req.query;
+    let query = `
+      SELECT 
+        u.id, 
+        u.name, 
+        COUNT(n.id) as crops_count, 
+        SUM(CAST(n.area AS DECIMAL(10,2))) as total_area,
+        GROUP_CONCAT(n.harvest_status) as harvest_statuses,
+        GROUP_CONCAT(n.plantation_date) as plantation_dates,
+        GROUP_CONCAT(n.field_name) as field_names,
+        GROUP_CONCAT(n.nod_id) as nod_ids,
+        MAX(n.field_staff_id) as max_field_staff_id
+      FROM users u
+      LEFT JOIN nodani n ON u.id = n.farmer_id
+      WHERE u.role = 'Farmer'
+    `;
+
+    let queryParams = [];
+
+    if (staffId) {
+      query += ` AND n.field_staff_id = ?`;
+      queryParams.push(staffId);
+    }
+
+    query += ` GROUP BY u.id, u.name`;
+
+    const [rows] = await pool.query(query, queryParams);
+
+    const formattedFarmers = rows.map(row => {
+      let status = "GROWING";
+      let color = "blue";
+
+      const statuses = row.harvest_statuses ? row.harvest_statuses.split(',') : [];
+      const dates = row.plantation_dates ? row.plantation_dates.split(',') : [];
+      const nod_ids = row.nod_ids ? row.nod_ids.split(',') : [];
+
+      if (statuses.includes('ready_for_delivery')) {
+        status = "VERIFIED & READY";
+        color = "purple";
+      } else if (statuses.includes('declared')) {
+        status = "HARVEST READY";
+        color = "green";
+      } else {
+        const needsPestControl = dates.some(dateStr => {
+          if (!dateStr) return false;
+          const plantedDate = new Date(dateStr);
+          const diffDays = Math.ceil(Math.abs(new Date() - plantedDate) / (1000 * 60 * 60 * 24));
+          return diffDays >= 180 && diffDays < 200;
+        });
+
+        if (needsPestControl) {
+          status = "PEST CONTROL NEEDED";
+          color = "orange";
+        }
+      }
+
+      let location = "Unknown";
+      if (row.field_names) {
+        const fields = row.field_names.split(',');
+        if (fields.length > 0 && fields[0]) {
+          location = fields[0];
+        }
+      }
+
+      return {
+        id: row.id,
+        name: row.name,
+        location: location,
+        nod_id: nod_ids.length > 0 && nod_ids[0] ? nod_ids[0] : "Multiple Crops",
+        crops: row.crops_count || 0,
+        area: (row.total_area || 0) + " acres",
+        status: status,
+        color: color
+      };
+    });
+
+    res.json(formattedFarmers);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 });

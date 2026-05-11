@@ -38,7 +38,7 @@ const style = {
   p: { xs: 2, sm: 2.5 },
 };
 
-const DispatchModal = ({ open, handleClose }) => {
+const DispatchModal = ({ open, handleClose, onSuccess }) => {
   const [form, setForm] = useState({
     farmer: "",
     vehicle: "",
@@ -47,9 +47,31 @@ const DispatchModal = ({ open, handleClose }) => {
     time: "",
   });
 
-  const farmers = ["Suresh Patil", "Ramesh Jadhav", "Prakash More"];
-  const vehicles = ["MH-12-1234", "MH-14-5678"];
-  const drivers = ["Rajesh Kumar", "Amit Sharma"];
+  const [farmersList, setFarmersList] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [driversList, setDriversList] = useState([]);
+
+  useEffect(() => {
+    if (open) {
+      const fetchData = async () => {
+        try {
+          const resFarmers = await fetch("http://localhost:8000/getAllFarmers");
+          const dataFarmers = await resFarmers.json();
+          setFarmersList(dataFarmers);
+
+          const resDrivers = await fetch("http://localhost:8000/getAllDrivers");
+          const dataDrivers = await resDrivers.json();
+          setDriversList(dataDrivers);
+
+          const v = dataDrivers.map(d => d.vehicle_number || d.vehicle).filter(Boolean);
+          setVehicles([...new Set(v)]);
+        } catch (error) {
+          console.error("Error fetching data for dispatch modal", error);
+        }
+      };
+      fetchData();
+    }
+  }, [open]);
 
   const [AssignModalOpen, setAssignModalOpen] = useState(false);
 
@@ -60,16 +82,40 @@ const DispatchModal = ({ open, handleClose }) => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log(form);
-
+  const handleSubmit = async () => {
     if (!form.farmer || !form.vehicle || !form.driver || !form.date) {
       alert("Please fill all required fields");
       return;
     }
 
-    alert("🚚 Vehicle Dispatched Successfully!");
-    handleClose();
+    const selectedFarmer = farmersList.find(f => f.name === form.farmer);
+    const selectedDriver = driversList.find(d => d.name === form.driver);
+
+    try {
+      const response = await fetch("http://localhost:8000/add-delivery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          farmerId: selectedFarmer?.id,
+          farmerName: form.farmer,
+          driverId: selectedDriver?.id,
+          driverName: form.driver,
+          vehicleNumber: form.vehicle,
+          date: form.date,
+          time: form.time
+        })
+      });
+
+      if (response.ok) {
+        alert("🚚 Vehicle Dispatched Successfully!");
+        handleClose();
+        if (onSuccess) onSuccess();
+      } else {
+        alert("Failed to dispatch vehicle.");
+      }
+    } catch (error) {
+      console.error("Error dispatching vehicle", error);
+    }
   };
 
 
@@ -121,9 +167,9 @@ const DispatchModal = ({ open, handleClose }) => {
               },
             }}
           >
-            {farmers.map((f, i) => (
-              <MenuItem key={i} value={f}>
-                {f}
+            {farmersList.map((f, i) => (
+              <MenuItem key={i} value={f.name}>
+                {f.name}
               </MenuItem>
             ))}
           </TextField>
@@ -179,9 +225,9 @@ const DispatchModal = ({ open, handleClose }) => {
               },
             }}
           >
-            {drivers.map((d, i) => (
-              <MenuItem key={i} value={d}>
-                {d}
+            {driversList.map((d, i) => (
+              <MenuItem key={i} value={d.name}>
+                {d.name}
               </MenuItem>
             ))}
           </TextField>
@@ -549,6 +595,26 @@ function Farmeradminpanel() {
     }
   };
 
+  const [adminDeliveries, setAdminDeliveries] = useState([]);
+
+  const fetchAdminDeliveries = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/get-deliveries");
+      const data = await response.json();
+      setAdminDeliveries(data.map(d => ({
+        id: "DEL-" + String(d.id).padStart(4, '0'),
+        farmer: d.farmer_name,
+        driver: d.driver_name,
+        tons: d.weight || "Pending",
+        route: "Field → Factory",
+        status: d.status,
+        color: d.status === "COMPLETED" ? "green" : d.status === "SCHEDULED" ? "orange" : "blue"
+      })));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleDeleteCrop = async (id) => {
 
     try {
@@ -575,89 +641,107 @@ function Farmeradminpanel() {
     }
   }
 
+  const [farmers, setFarmers] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState({
+    totalFarmers: 0,
+    activeCrops: 0,
+    pendingDeliveries: 0,
+    monthlyRevenue: "₹0.0L"
+  });
+
+  const [staffList, setStaffList] = useState([]);
+  const [selectedFarmerForStaff, setSelectedFarmerForStaff] = useState(null);
+
+  const fetchAdminFarmers = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/admin/farmers");
+      const data = await response.json();
+      setFarmers(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/admin/dashboard-stats");
+      const data = await response.json();
+      setDashboardStats(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchStaff = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/getAllFieldStaff");
+      const data = await response.json();
+      setStaffList(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAssignStaffSubmit = async () => {
+    try {
+      await fetch("http://localhost:8000/assignStaff", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          farmer_id: selectedFarmerForStaff.id,
+          staff_id: selectedStaff
+        })
+      });
+      setAssignModalOpen(false);
+      setSelectedStaff("");
+      alert("Staff assigned successfully!");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getAllCrops();
+    fetchAdminFarmers();
+    fetchStats();
+    fetchStaff();
+    fetchAdminDeliveries();
   }, []);
 
 
   const stats = [
     {
       title: "Total Farmers",
-      value: "45",
-      sub: "+3 this month",
+      value: dashboardStats.totalFarmers,
+      sub: "Active users",
       icon: <FaUsers />,
       color: "green",
     },
     {
       title: "Active Crops",
-      value: "78",
-      sub: "across 45 farms",
+      value: dashboardStats.activeCrops,
+      sub: `across ${dashboardStats.totalFarmers} farms`,
       icon: <FaChartBar />,
       color: "blue",
     },
     {
       title: "Pending Deliveries",
-      value: "12",
+      value: dashboardStats.pendingDeliveries,
       sub: "Requires attention",
       icon: <FaTruck />,
       color: "orange",
     },
     {
       title: "Monthly Revenue",
-      value: "₹28.5L",
-      sub: "+12% vs last month",
+      value: dashboardStats.monthlyRevenue,
+      sub: "This month",
       icon: <FaDollarSign />,
       color: "green",
     },
   ];
 
-  const farmers = [
-    {
-      name: "Suresh Patil",
-      location: "Kolhapur",
-      crops: 2,
-      area: "4.3 acres",
-      status: "HARVEST READY",
-      color: "green",
-    },
-    {
-      name: "Ramesh Jadhav",
-      location: "Sangli",
-      crops: 1,
-      area: "2.8 acres",
-      status: "GROWING",
-      color: "blue",
-    },
-    {
-      name: "Prakash More",
-      location: "Satara",
-      crops: 3,
-      area: "5.2 acres",
-      status: "PEST CONTROL NEEDED",
-      color: "orange",
-    },
-  ];
 
-  const deliveries = [
-    {
-      id: "D001",
-      farmer: "Suresh Patil",
-      driver: "Rajesh Kumar",
-      tons: 45,
-      route: "Kolhapur → Factory",
-      status: "PICKUP CONFIRMED",
-      color: "blue",
-    },
-    {
-      id: "D002",
-      farmer: "Vikram Shinde",
-      driver: "Unassigned",
-      tons: 38,
-      route: "Sangli → Factory",
-      status: "PENDING ASSIGNMENT",
-      color: "orange",
-    },
-  ];
+
 
   const handleAddcrops = () => {
     setopenAddcrops(true)
@@ -755,7 +839,7 @@ function Farmeradminpanel() {
                 <div className="right">
                   <span className={`badge ${f.color}`}>{f.status}</span>
                   <button className='buttonHover'><FaEye /> View</button>
-                  <button className='buttonHover' onClick={() => setAssignModalOpen(true)}><FaUserPlus /> Assign Staff</button>
+                  <button className='buttonHover' onClick={() => { setSelectedFarmerForStaff(f); setAssignModalOpen(true); }}><FaUserPlus /> Assign Staff</button>
                 </div>
               </div>
             ))}
@@ -767,12 +851,12 @@ function Farmeradminpanel() {
           <div className="card">
             <h2>Delivery Management</h2>
 
-            {deliveries.map((d, i) => (
+            {adminDeliveries.map((d, i) => (
               <div className="row" key={i}>
                 <div className="left">
                   <div className="avatar"><FaTruck /></div>
                   <div>
-                    <h4>Delivery {d.id}</h4>
+                    <h4>{d.id}</h4>
                     <p>{d.farmer} • {d.driver} • {d.tons} tons</p>
                     <p>{d.route}</p>
                   </div>
@@ -840,7 +924,7 @@ function Farmeradminpanel() {
       </div>
 
       <FarmerRegistrationModal open={openAddFarmer} handleClose={handleCloseAddFarmer} />
-      <DispatchModal open={open} handleClose={handleClose} />
+      <DispatchModal open={open} handleClose={handleClose} onSuccess={() => { fetchAdminDeliveries(); fetchStats(); }} />
 
       <Modal
         open={openRecord}
@@ -918,12 +1002,12 @@ function Farmeradminpanel() {
               <div className="drvAssignStaff_infoBox">
                 <div>
                   <p className="drvAssignStaff_label">Nodani Ref</p>
-                  <h3 className="drvAssignStaff_value">NOD-2024-001</h3>
+                  <h3 className="drvAssignStaff_value">{selectedFarmerForStaff?.nod_id || "Multiple"}</h3>
                 </div>
 
                 <div>
                   <p className="drvAssignStaff_label">Farmer</p>
-                  <h3 className="drvAssignStaff_value">Suresh Patil</h3>
+                  <h3 className="drvAssignStaff_value">{selectedFarmerForStaff?.name || "N/A"}</h3>
                 </div>
               </div>
 
@@ -939,9 +1023,9 @@ function Farmeradminpanel() {
                   onChange={(e) => setSelectedStaff(e.target.value)}
                 >
                   <option value="">Choose available staff</option>
-                  <option value="staff1">Ravi Kumar</option>
-                  <option value="staff2">Amit Sharma</option>
-                  <option value="staff3">Sanjay Patil</option>
+                  {staffList.map((staff) => (
+                    <option key={staff.id} value={staff.id}>{staff.name}</option>
+                  ))}
                 </select>
               </div>
 
@@ -949,6 +1033,7 @@ function Farmeradminpanel() {
               <button
                 className="drvAssignStaff_btn"
                 disabled={!selectedStaff}
+                onClick={handleAssignStaffSubmit}
               >
                 <FaCheckCircle /> Assign & Notify Staff
               </button>

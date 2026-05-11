@@ -17,36 +17,36 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/farmer" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Farmer']}>
             <Farmer />
           </ProtectedRoute>
         } />
         <Route path='/crop-detail' element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Farmer']}>
             <Cropdetails />
           </ProtectedRoute>
-        }/>
+        } />
         <Route path='/delivery' element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Farmer']}>
             <Delivery />
           </ProtectedRoute>
-        }/>
+        } />
         <Route path="/farmer-admin-panel" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Factory Admin']}>
             <Farmeradminpanel />
           </ProtectedRoute>
-        }/>
+        } />
         <Route path='/field' element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Field Staff']}>
             <Field />
           </ProtectedRoute>
-        }/>
+        } />
         <Route path='/driver' element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['Driver']}>
             <Driver />
-            <Trip/>
+            <Trip />
           </ProtectedRoute>
-        }/>
+        } />
       </Routes>
     </div>
   );
