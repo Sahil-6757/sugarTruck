@@ -225,7 +225,7 @@ function Farmer() {
 
       alert("Harvest Declaration Submitted Successfully");
       setopenHarvest(false);
-      
+
       const user = JSON.parse(localStorage.getItem("user"));
       if (user && user.id) {
         getNodaniData(user.id);
@@ -570,13 +570,13 @@ function Farmer() {
               <div className="stats">
 
                 <div className="card">
-                  <p>Total Crops</p>
+                  <p style={{ marginLeft: "-8px" }}>Total Crops</p>
                   <h2 className='frm-Dashboard'>{crops.length}</h2>
                   <FaSeedling className="icon" />
                 </div>
 
                 <div className="card">
-                  <p>Total Area</p>
+                  <p style={{ marginLeft: "-8px" }}>Total Area</p>
                   <h2 className='frm-Dashboard'>
                     {crops.reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0)} acres
                   </h2>
@@ -584,13 +584,13 @@ function Farmer() {
                 </div>
 
                 <div className="card">
-                  <p>Active Deliveries</p>
+                  <p style={{ marginLeft: "-8px" }}>Active Deliveries</p>
                   <h2 className='frm-Dashboard'>{dashboardStats.deliveries}</h2>
                   <FaTruck className="icon" />
                 </div>
 
                 <div className="card">
-                  <p>Total Earnings</p>
+                  <p style={{ marginLeft: "-8px" }}>Total Earnings</p>
                   <h2 className='frm-Dashboard'>{dashboardStats.earnings}</h2>
                   <FaDollarSign className="icon" />
                 </div>
@@ -598,7 +598,7 @@ function Farmer() {
               </div>
 
               {/* TABS */}
-              <div className="tabs">
+              <div className="tabs" style={{ minInlineSize: '-webkit-fill-available' }}>
                 <button className="active">Overview</button>
                 <button onClick={() => navigation('/crop-detail')}>Crop Details</button>
                 <button onClick={() => navigation('/delivery')}>Deliveries</button>
@@ -719,7 +719,7 @@ function Farmer() {
                     <div className="modal-header">
                       <div className="title">
                         <FaLeaf />
-                        <h2>Harvest Ready Declaration</h2>
+                        <h2 style={{ fontSize: "24px" }}>Harvest Ready Declaration</h2>
                       </div>
                     </div>
 

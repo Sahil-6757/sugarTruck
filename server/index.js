@@ -316,6 +316,22 @@ async function ensureDatabaseAndTables() {
   if (!verifiedAtColumnRows.length) {
     await pool.query(`ALTER TABLE nodani ADD COLUMN verified_at TIMESTAMP NULL`);
   }
+
+  const [deliveryWeightsColumnRows] = await pool.query(
+    `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'deliveries'
+        AND COLUMN_NAME = 'gross_weight'
+        LIMIT 1
+        `,
+    [DB_NAME],
+  );
+
+  if (!deliveryWeightsColumnRows.length) {
+    await pool.query(`ALTER TABLE deliveries ADD COLUMN gross_weight VARCHAR(50) NULL, ADD COLUMN tare_weight VARCHAR(50) NULL`);
+  }
 }
 
 async function registerUser(req, res, fallbackRole) {
@@ -524,6 +540,22 @@ app.get("/getAllFieldStaff", async (req, res) => {
   }
 });
 
+app.get("/getHarvestReadyFarmers", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT DISTINCT u.id, u.name 
+       FROM users u 
+       JOIN nodani n ON u.id = n.farmer_id 
+       WHERE u.role = 'Farmer' AND n.harvest_status = 'ready_for_delivery'
+       ORDER BY u.name ASC`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 // --- FIELD STAFF: Submit Daily Report ---
 app.post("/staff/submitDailyReport", async (req, res) => {
   try {
@@ -628,6 +660,38 @@ app.get("/get-deliveries", async (req, res) => {
 
     const [rows] = await pool.query(query, params);
     res.json(rows);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.get("/get-pending-weighments", async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT * FROM deliveries WHERE status != 'COMPLETED' ORDER BY created_at DESC`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.put("/update-weighment/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { grossWeight, tareWeight, netWeight } = req.body;
+
+    const sql = `
+      UPDATE deliveries 
+      SET gross_weight = ?, tare_weight = ?, weight = ?, status = 'COMPLETED'
+      WHERE id = ?
+    `;
+
+    await pool.query(sql, [grossWeight, tareWeight, netWeight, id]);
+
+    res.json({ message: "Weighment updated successfully" });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Server Error" });

@@ -7,7 +7,7 @@ import {
   FaUsers,
   FaTruck,
   FaPhone,
-  FaEnvelope,
+  FaEnvelope
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 

@@ -29,13 +29,14 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '94vw', sm: 470 },
-  maxWidth: 470,
+  width: { xs: '94vw', sm: 580 },
+  maxWidth: 580,
   bgcolor: '#ffffff',
-  border: '1px solid #dfe5e1',
-  borderRadius: 1.2,
-  boxShadow: '0 14px 30px rgba(15, 23, 42, 0.18)',
-  p: { xs: 2, sm: 2.5 },
+  borderRadius: '24px',
+  boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
+  p: 0,
+  outline: 'none',
+  overflow: 'hidden'
 };
 
 const DispatchModal = ({ open, handleClose, onSuccess }) => {
@@ -48,6 +49,7 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
   });
 
   const [farmersList, setFarmersList] = useState([]);
+  const [harvestReadyFarmers, setHarvestReadyFarmers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [driversList, setDriversList] = useState([]);
 
@@ -58,6 +60,10 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
           const resFarmers = await fetch("http://localhost:8000/getAllFarmers");
           const dataFarmers = await resFarmers.json();
           setFarmersList(dataFarmers);
+
+          const resReady = await fetch("http://localhost:8000/getHarvestReadyFarmers");
+          const dataReady = await resReady.json();
+          setHarvestReadyFarmers(dataReady);
 
           const resDrivers = await fetch("http://localhost:8000/getAllDrivers");
           const dataDrivers = await resDrivers.json();
@@ -127,183 +133,145 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
       slotProps={{
         backdrop: {
           sx: {
-            backgroundColor: 'rgba(17, 24, 39, 0.3)',
+            backgroundColor: 'rgba(15, 23, 42, 0.4)',
+            backdropFilter: 'blur(8px)',
           },
         },
       }}
     >
-      <Box sx={style}>
-        <Box display="flex" flexDirection="column" justifyContent="space-between" alignItems="center">
-          <Box display="inline-flex" gap={1} alignItems="center">
-            {/* <LocalShippingIcon sx={{ color: "#2e7d32", fontSize: 28 }} /> */}
-            <Typography variant="h6" fontWeight={700} sx={{ fontSize: { xs: 18, sm: 22 } }}>
-              Vehicle Dispatch & Delivery Assignment
-            </Typography>
-          </Box>
-
-
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: { xs: '94vw', sm: 640 },
+        bgcolor: '#ffffff',
+        borderRadius: '24px',
+        boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
+        outline: 'none',
+        overflow: 'hidden',
+        fontFamily: "'Outfit', sans-serif"
+      }}>
+        <Box className="fw-header" sx={{ p: '24px 32px !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5" fontWeight={800} sx={{ fontSize: { xs: 20, sm: 24 }, color: '#0f172a', letterSpacing: '-0.02em' }}>
+            Vehicle Dispatch
+          </Typography>
+          <FaTimes onClick={handleClose} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
         </Box>
 
-        <Box mt={3} display="flex" flexDirection="column" gap={1.8}>
-          <Typography sx={{ fontSize: 15, fontWeight: 600, color: '#1f2937' }}>
-            Select Farmer (Harvest Ready) <Box component="span" sx={{ color: '#ef4444' }}>*</Box>
-          </Typography>
-          <TextField
+        <Box sx={{ p: 4 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            
+            {/* Farmer Selection Section */}
+            <div className="fw-section" style={{ padding: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <div style={{ width: '32px', height: '32px', background: 'var(--primary-soft)', color: 'var(--primary)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                  <FaUser />
+                </div>
+                <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>Farmer Selection</h4>
+              </div>
 
-            name="farmer"
-            value={form.farmer}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            SelectProps={{
-              displayEmpty: true,
-              renderValue: (selected) => selected || 'Choose farmer',
-            }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                bgcolor: '#fff',
-                height: 44,
-              },
-            }}
-          >
-            {farmersList.map((f, i) => (
-              <MenuItem key={i} value={f.name}>
-                {f.name}
-              </MenuItem>
-            ))}
-          </TextField>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <label className="fw-label">Harvest Ready (Quick)</label>
+                  <select 
+                    className="fw-input" 
+                    name="farmer" 
+                    value={form.farmer} 
+                    onChange={handleChange}
+                  >
+                    <option value="">Choose ready farmer</option>
+                    {harvestReadyFarmers.map((f, i) => (
+                      <option key={i} value={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="fw-label">Search All Farmers <span>*</span></label>
+                  <select 
+                    className="fw-input" 
+                    name="farmer" 
+                    value={form.farmer} 
+                    onChange={handleChange}
+                  >
+                    <option value="">Select farmer</option>
+                    {farmersList.map((f, i) => (
+                      <option key={i} value={f.name}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
 
-          <Typography sx={{ fontSize: 15, fontWeight: 600, color: '#1f2937' }}>
-            Assign Vehicle <Box component="span" sx={{ color: '#ef4444' }}>*</Box>
-          </Typography>
-          <TextField
-            select
-            name="vehicle"
-            value={form.vehicle}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            SelectProps={{
-              displayEmpty: true,
-              renderValue: (selected) => selected || 'Choose truck',
-            }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                bgcolor: '#fff',
-                height: 44,
-              },
-            }}
-          >
-            {vehicles.map((v, i) => (
-              <MenuItem key={i} value={v}>
-                {v}
-              </MenuItem>
-            ))}
-          </TextField>
+            <div style={{ borderTop: '1px dashed #e2e8f0' }}></div>
 
-          <Typography sx={{ fontSize: 15, fontWeight: 600, color: '#1f2937' }}>
-            Assign Driver <Box component="span" sx={{ color: '#ef4444' }}>*</Box>
-          </Typography>
-          <TextField
-            select
-            name="driver"
-            value={form.driver}
-            onChange={handleChange}
-            fullWidth
-            size="small"
-            SelectProps={{
-              displayEmpty: true,
-              renderValue: (selected) => selected || 'Choose driver',
-            }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                bgcolor: '#fff',
-                height: 44,
-              },
-            }}
-          >
-            {driversList.map((d, i) => (
-              <MenuItem key={i} value={d.name}>
-                {d.name}
-              </MenuItem>
-            ))}
-          </TextField>
+            {/* Logistics Section */}
+            <div className="fw-section" style={{ padding: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <div style={{ width: '32px', height: '32px', background: '#eff6ff', color: '#1e40af', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                  <FaTruck />
+                </div>
+                <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>Logistics & Personnel</h4>
+              </div>
 
-          <Grid container spacing={1.5}>
-            <Grid item xs={6}>
-              <Typography sx={{ mb: 0.8, fontSize: 15, fontWeight: 600, color: '#1f2937' }}>
-                Pickup Date <Box component="span" sx={{ color: '#ef4444' }}>*</Box>
-              </Typography>
-              <TextField
-                type="date"
-                name="date"
-                value={form.date}
-                onChange={handleChange}
-                fullWidth
-                size="small"
-                InputLabelProps={{ shrink: true }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    bgcolor: '#fff',
-                    height: 44,
-                  },
-                }}
-              />
-            </Grid>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <label className="fw-label">Assign Vehicle <span>*</span></label>
+                  <select className="fw-input" name="vehicle" value={form.vehicle} onChange={handleChange}>
+                    <option value="">Choose truck</option>
+                    {vehicles.map((v, i) => (
+                      <option key={i} value={v}>{v}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="fw-label">Assign Driver <span>*</span></label>
+                  <select className="fw-input" name="driver" value={form.driver} onChange={handleChange}>
+                    <option value="">Choose driver</option>
+                    {driversList.map((d, i) => (
+                      <option key={i} value={d.name}>{d.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
 
-            <Grid item xs={6}>
-              <Typography sx={{ mb: 0.8, fontSize: 15, fontWeight: 600, color: '#1f2937' }}>
-                Pickup Time
-              </Typography>
-              <TextField
-                type="time"
-                name="time"
-                value={form.time}
-                onChange={handleChange}
-                fullWidth
-                size="small"
-                InputLabelProps={{ shrink: true }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    bgcolor: '#fff',
-                    height: 44,
-                  },
-                }}
-              />
-            </Grid>
-          </Grid>
+            <div style={{ borderTop: '1px dashed #e2e8f0' }}></div>
 
-          <Button
-            variant="contained"
-            fullWidth
-            startIcon={<CheckCircleIcon />}
-            onClick={handleSubmit}
-            sx={{
-              mt: 2,
-              bgcolor: "#2e7d32",
-              height: 44,
-              fontWeight: 700,
-              borderRadius: 2,
-              letterSpacing: 0,
-              textTransform: 'none',
-              boxShadow: 'none',
-              "&:hover": {
-                bgcolor: "#1b5e20",
-                boxShadow: 'none',
-              },
-            }}
-          >
-            Dispatch Vehicle & Notify All
-          </Button>
+            {/* Schedule Section */}
+            <div className="fw-section" style={{ padding: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <div style={{ width: '32px', height: '32px', background: '#fef3c7', color: '#92400e', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                  <FaChartBar />
+                </div>
+                <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>Dispatch Schedule</h4>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <label className="fw-label">Pickup Date <span>*</span></label>
+                  <input className="fw-input" type="date" name="date" value={form.date} onChange={handleChange} />
+                </div>
+                <div>
+                  <label className="fw-label">Pickup Time</label>
+                  <input className="fw-input" type="time" name="time" value={form.time} onChange={handleChange} />
+                </div>
+              </div>
+            </div>
+
+            <button 
+              className="fw-confirm-btn" 
+              style={{ width: '100%', margin: '16px 0 0' }}
+              onClick={handleSubmit}
+            >
+              ✔ Dispatch Vehicle & Notify
+            </button>
+          </div>
         </Box>
       </Box>
     </Modal>
   );
+
 }
 
 const FarmerRegistrationModal = ({ open, handleClose }) => {
@@ -359,18 +327,37 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
     handleClose();
     setStep(1);
   };
-
   return (
-    <Modal open={open} onClose={handleClose} slotProps={{ backdrop: { sx: { backgroundColor: 'rgba(17, 24, 39, 0.3)' } } }}>
-      <Box sx={{ ...style, width: { xs: '94vw', sm: 540 }, maxWidth: 540 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Box display="inline-flex" gap={1} alignItems="center">
-            {/* <FaUserPlus style={{ color: "#2e7d32", fontSize: 22 }} /> */}
-            <Typography variant="h6" fontWeight={700} sx={{ fontSize: { xs: 18, sm: 20 }, color: '#1f2937' }}>
-              Farmer Registration
-            </Typography>
-          </Box>
-
+    <Modal
+      open={open}
+      onClose={handleClose}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backgroundColor: 'rgba(15, 23, 42, 0.4)',
+            backdropFilter: 'blur(8px)',
+          },
+        },
+      }}
+    >
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: { xs: '94vw', sm: 700 },
+        bgcolor: '#ffffff',
+        borderRadius: '24px',
+        boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
+        outline: 'none',
+        overflow: 'hidden',
+        fontFamily: "'Outfit', sans-serif"
+      }}>
+        <Box className="fw-header" sx={{ p: '24px 32px !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5" fontWeight={800} sx={{ fontSize: { xs: 20, sm: 24 }, color: '#0f172a', letterSpacing: '-0.02em' }}>
+            Farmer Registration
+          </Typography>
+          <FaTimes onClick={handleClose} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
         </Box>
 
         <div className="fr-container">
@@ -380,25 +367,16 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
             {steps.map((s, i) => (
               <React.Fragment key={s.num}>
                 <div className="fr-step-item">
-                  <div
-                    className={`fr-step-circle ${step >= s.num ? "fr-active" : ""
-                      }`}
-                  >
-                    {step > s.num ? <CheckCircleIcon /> : s.num}
+                  <div className={`fr-step-circle ${step >= s.num ? "fr-active" : ""}`}>
+                    {step > s.num ? <FaCheckCircle /> : s.num}
                   </div>
-                  <span
-                    className={`fr-step-label ${step >= s.num ? "fr-active-text" : ""
-                      }`}
-                  >
+                  <span className={`fr-step-label ${step >= s.num ? "fr-active-text" : ""}`}>
                     {s.label}
                   </span>
                 </div>
 
                 {i < 2 && (
-                  <div
-                    className={`fr-step-line ${step > s.num ? "fr-line-active" : ""
-                      }`}
-                  />
+                  <div className={`fr-step-line ${step > s.num ? "fr-line-active" : ""}`} />
                 )}
               </React.Fragment>
             ))}
@@ -410,49 +388,52 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
             {/* STEP 1 */}
             {step === 1 && (
               <div className="fr-form">
-                <div className="fr-field">
-                  <label>
-                    Full Name <span>*</span>
-                  </label>
-                  <input
-                    type='text'
-                    name="fullName"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    placeholder="Enter farmer's full name"
-                  />
+                <div className="fr-section-title">
+                  <FaUser /> Personal Information
                 </div>
 
-                <div className="fr-field">
-                  <label>
-                    Mobile Number <span>*</span>
-                  </label>
-                  <div className="fr-mobile-row">
-                    <input value="+91" disabled className="fr-prefix" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <label className="fw-label">Full Name <span>*</span></label>
                     <input
-                      name="mobileNumber"
-                      value={form.mobileNumber}
+                      type='text'
+                      name="fullName"
+                      value={form.fullName}
                       onChange={handleChange}
-                      placeholder="9876543210"
-                      maxLength={10}
+                      className="fw-input"
+                      placeholder="Enter farmer's full name"
                     />
-                    <button className="fr-btn fr-btn-green">
-                      Send OTP
-                    </button>
                   </div>
-                </div>
 
-                <div className="fr-field">
-                  <label>
-                    Aadhaar Number <span>*</span>
-                  </label>
-                  <input
-                    name="aadhaarNumber"
-                    value={form.aadhaarNumber}
-                    maxLength={12}
-                    onChange={handleChange}
-                    placeholder="XXXX XXXX XXXX"
-                  />
+                  <div>
+                    <label className="fw-label">Mobile Number <span>*</span></label>
+                    <div className="fr-mobile-row">
+                      <input value="+91" disabled className="fw-input fr-prefix" />
+                      <input
+                        name="mobileNumber"
+                        value={form.mobileNumber}
+                        onChange={handleChange}
+                        className="fw-input"
+                        placeholder="9876543210"
+                        maxLength={10}
+                      />
+                      <button className="btn" style={{ height: '52px', padding: '0 20px', whiteSpace: 'nowrap' }}>
+                        Send OTP
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="fw-label">Aadhaar Number <span>*</span></label>
+                    <input
+                      name="aadhaarNumber"
+                      value={form.aadhaarNumber}
+                      maxLength={12}
+                      onChange={handleChange}
+                      className="fw-input"
+                      placeholder="XXXX XXXX XXXX"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -465,29 +446,29 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
                 </div>
 
                 <div className="fr-grid">
-                  <div className="fr-field">
-                    <label>Village <span>*</span></label>
-                    <input name="village" value={form.village} onChange={handleChange} placeholder="Village name" />
+                  <div>
+                    <label className="fw-label">Village <span>*</span></label>
+                    <input className="fw-input" name="village" value={form.village} onChange={handleChange} placeholder="Village name" />
                   </div>
 
-                  <div className="fr-field">
-                    <label>Taluka <span>*</span></label>
-                    <input name="taluka" value={form.taluka} onChange={handleChange} placeholder="Taluka name" />
+                  <div>
+                    <label className="fw-label">Taluka <span>*</span></label>
+                    <input className="fw-input" name="taluka" value={form.taluka} onChange={handleChange} placeholder="Taluka name" />
                   </div>
 
-                  <div className="fr-field">
-                    <label>District <span>*</span></label>
-                    <input name="district" value={form.district} onChange={handleChange} placeholder="District name" />
+                  <div>
+                    <label className="fw-label">District <span>*</span></label>
+                    <input className="fw-input" name="district" value={form.district} onChange={handleChange} placeholder="District name" />
                   </div>
 
-                  <div className="fr-field">
-                    <label>State</label>
-                    <input name="state" value={form.state} onChange={handleChange} placeholder="Maharashtra" />
+                  <div>
+                    <label className="fw-label">State</label>
+                    <input className="fw-input" name="state" value={form.state} onChange={handleChange} placeholder="Maharashtra" />
                   </div>
 
                   <div className="fr-field fr-full">
-                    <label>PIN Code <span>*</span></label>
-                    <input name="pinCode" value={form.pinCode} maxLength={6} onChange={handleChange} placeholder="6-digit PIN code" />
+                    <label className="fw-label">PIN Code <span>*</span></label>
+                    <input className="fw-input" name="pinCode" value={form.pinCode} maxLength={6} onChange={handleChange} placeholder="6-digit PIN code" />
                   </div>
                 </div>
               </div>
@@ -500,24 +481,27 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
                   <FaCreditCard /> Bank Account Information
                 </div>
 
-                <div className="fr-field">
-                  <label>Bank Name <span>*</span></label>
-                  <input name="bankName" value={form.bankName} onChange={handleChange} placeholder="e.g., State Bank of India" />
-                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <label className="fw-label">Bank Name <span>*</span></label>
+                    <input className="fw-input" name="bankName" value={form.bankName} onChange={handleChange} placeholder="e.g., State Bank of India" />
+                  </div>
 
-                <div className="fr-field">
-                  <label>Account Holder Name <span>*</span></label>
-                  <input name="accountHolderName" value={form.accountHolderName} onChange={handleChange} />
-                </div>
+                  <div>
+                    <label className="fw-label">Account Holder Name <span>*</span></label>
+                    <input className="fw-input" name="accountHolderName" value={form.accountHolderName} onChange={handleChange} />
+                  </div>
 
-                <div className="fr-field">
-                  <label>Account Number <span>*</span></label>
-                  <input name="accountNumber" value={form.accountNumber} onChange={handleChange} />
-                </div>
-
-                <div className="fr-field">
-                  <label>IFSC Code <span>*</span></label>
-                  <input name="ifscCode" value={form.ifscCode} onChange={handleChange} />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div>
+                      <label className="fw-label">Account Number <span>*</span></label>
+                      <input className="fw-input" name="accountNumber" value={form.accountNumber} onChange={handleChange} />
+                    </div>
+                    <div>
+                      <label className="fw-label">IFSC Code <span>*</span></label>
+                      <input className="fw-input" name="ifscCode" value={form.ifscCode} onChange={handleChange} />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -525,15 +509,15 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
 
           {/* Footer Buttons */}
           <div className="fr-footer">
-            {step > 1 && (
+            {step > 1 ? (
               <button className="fr-btn fr-btn-outline" onClick={prevStep}>
                 Back
               </button>
-            )}
+            ) : <div />}
 
             {step < 3 ? (
               <button className="fr-btn fr-btn-green" onClick={nextStep}>
-                Next: {step === 1 ? "Address Details" : "Bank Details"}
+                Next Step
               </button>
             ) : (
               <button className="fr-btn fr-btn-green" onClick={onComplete}>
@@ -561,7 +545,63 @@ function Farmeradminpanel() {
 
 
   const [openRecord, setOpenRecord] = useState(false);
-  const [AssignModalOpen, setAssignModalOpen] = useState(false);
+  const [pendingWeighments, setPendingWeighments] = useState([]);
+  const [selectedDeliveryForWeighment, setSelectedDeliveryForWeighment] = useState(null);
+  const [weighmentForm, setWeighmentForm] = useState({
+    grossWeight: "",
+    tareWeight: ""
+  });
+
+  const handleRecord = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/get-pending-weighments");
+      const data = await response.json();
+      setPendingWeighments(data);
+      setOpenRecord(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const closeRecord = () => {
+    setOpenRecord(false);
+    setSelectedDeliveryForWeighment(null);
+    setWeighmentForm({ grossWeight: "", tareWeight: "" });
+  };
+
+  const handleSubmitWeighment = async () => {
+    if (!selectedDeliveryForWeighment || !weighmentForm.grossWeight || !weighmentForm.tareWeight) {
+      alert("Please select a delivery and enter both weights.");
+      return;
+    }
+
+    const netWeight = (parseFloat(weighmentForm.grossWeight) - parseFloat(weighmentForm.tareWeight)).toFixed(2);
+
+    try {
+      const response = await fetch(`http://localhost:8000/update-weighment/${selectedDeliveryForWeighment.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          grossWeight: weighmentForm.grossWeight,
+          tareWeight: weighmentForm.tareWeight,
+          netWeight: netWeight
+        })
+      });
+
+      if (response.ok) {
+        alert("⚖️ Weighment Recorded Successfully!");
+        closeRecord();
+        fetchAdminDeliveries();
+        fetchStats();
+      } else {
+        alert("Failed to record weighment.");
+      }
+    } catch (error) {
+      console.error("Error updating weighment", error);
+    }
+  };
+
+  const [tab, setTab] = useState("farmers");
 
   const [openView, setopenView] = useState(false)
   const [selectedFarmerForView, setSelectedFarmerForView] = useState(null)
@@ -573,11 +613,7 @@ function Farmeradminpanel() {
     setopenView(false);
     setSelectedFarmerForView(null);
   }
-
-  const handleRecord = () => setOpenRecord(true);
-  const closeRecord = () => setOpenRecord(false)
-
-  const [tab, setTab] = useState("farmers");
+  const [AssignModalOpen, setAssignModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState("");
 
   const [crops, setCrops] = useState("");
@@ -763,9 +799,9 @@ function Farmeradminpanel() {
   }
 
   return (
-    <div>
-      <Navbar />
+    <>
       <div className="admin-page">
+        <Navbar />
 
         {/* HEADER */}
         <div className="admin-header">
@@ -815,11 +851,8 @@ function Farmeradminpanel() {
           ))}
         </div>
 
-      </div>
-      <div className="admin-tabs">
-
         {/* TABS */}
-        <div className="tabs">
+        <div className="tabs" style={{ inlineSize: "-webkit-fill-available" }}>
 
           <button onClick={() => setTab("farmers")} className={tab === "farmers" ? "active" : ""}>
             Farmers & Crops
@@ -848,9 +881,9 @@ function Farmeradminpanel() {
                 </div>
 
                 <div className="right">
-                  <span style={{ marginbottom: 0 }} className={`badge ${f.color}`}>{f.status}</span>
+                  <span className={`badge ${f.color}`}>{f.status}</span>
                   {f.status === "VERIFIED & READY" && f.verifiedBy && (
-                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', textAlign: 'right' }}>
+                    <div style={{ fontSize: '11px', color: '#6b7280', textAlign: 'right', marginTop: "6px" }}>
                       Verified by: <strong>{f.verifiedBy}</strong>
                     </div>
                   )}
@@ -864,81 +897,106 @@ function Farmeradminpanel() {
         <Modal
           open={openView}
           onClose={closeView}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+          slotProps={{
+            backdrop: {
+              sx: {
+                backgroundColor: 'rgba(15, 23, 42, 0.4)',
+                backdropFilter: 'blur(8px)'
+              }
+            }
+          }}
         >
-          <Box sx={{ ...style, width: { xs: '95vw', sm: 500 } }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-              <Typography id="modal-modal-title" variant="h6" fontWeight={700} color="#1f2937">
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { xs: '94vw', sm: 520 },
+            bgcolor: 'background.paper',
+            borderRadius: '24px',
+            boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
+            overflow: 'hidden',
+            outline: 'none',
+            fontFamily: "'Outfit', sans-serif"
+          }}>
+            <Box className="fw-header" sx={{ p: '24px 32px !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h5" fontWeight={800} sx={{ fontSize: { xs: 20, sm: 24 }, color: '#0f172a', letterSpacing: '-0.02em' }}>
                 Inspection Details
               </Typography>
-              <FaTimes onClick={closeView} style={{ cursor: 'pointer', color: '#6b7280' }} />
-            </div>
+              <FaTimes onClick={closeView} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
+            </Box>
 
-            {selectedFarmerForView ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
-                  <div style={{ background: '#3b82f6', color: 'white', padding: '8px', borderRadius: '50%', display: 'flex' }}><FaUser /></div>
-                  <div>
-                    <div style={{ fontWeight: 600, color: '#1f2937' }}>{selectedFarmerForView.name}</div>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{selectedFarmerForView.location}</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div style={{ background: '#f0fdf4', padding: '12px', borderRadius: '8px', border: '1px solid #dcfce7' }}>
-                    <div style={{ fontSize: '11px', color: '#166534', fontWeight: 600, textTransform: 'uppercase' }}>Status</div>
-                    <div style={{ fontWeight: 600, color: '#15803d', marginTop: '4px' }}>{selectedFarmerForView.status}</div>
-                  </div>
-                  <div style={{ background: '#eff6ff', padding: '12px', borderRadius: '8px', border: '1px solid #dbeafe' }}>
-                    <div style={{ fontSize: '11px', color: '#1e40af', fontWeight: 600, textTransform: 'uppercase' }}>Crop ID</div>
-                    <div style={{ fontWeight: 600, color: '#1d4ed8', marginTop: '4px' }}>{selectedFarmerForView.nod_id}</div>
-                  </div>
-                </div>
-
-                <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
-                  <div style={{ background: '#f9fafb', padding: '10px 12px', borderBottom: '1px solid #e5e7eb', fontWeight: 600, fontSize: '13px', color: '#374151' }}>
-                    Verification Report
-                  </div>
-                  <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                      <span style={{ color: '#6b7280' }}>Inspected By:</span>
-                      <strong style={{ color: '#111827' }}>{selectedFarmerForView.verifiedBy || 'Not Verified'}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                      <span style={{ color: '#6b7280' }}>Date:</span>
-                      <strong style={{ color: '#111827' }}>{selectedFarmerForView.verifiedAt ? new Date(selectedFarmerForView.verifiedAt).toLocaleDateString() : 'N/A'}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                      <span style={{ color: '#6b7280' }}>Condition:</span>
-                      <span style={{ 
-                        padding: '2px 8px', 
-                        borderRadius: '12px', 
-                        fontSize: '11px', 
-                        fontWeight: 700,
-                        background: selectedFarmerForView.verificationCondition === 'good' ? '#dcfce7' : selectedFarmerForView.verificationCondition === 'average' ? '#fef9c3' : '#fee2e2',
-                        color: selectedFarmerForView.verificationCondition === 'good' ? '#166534' : selectedFarmerForView.verificationCondition === 'average' ? '#854d0e' : '#991b1b',
-                        textTransform: 'capitalize'
-                      }}>
-                        {selectedFarmerForView.verificationCondition || 'N/A'}
-                      </span>
-                    </div>
-                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #e5e7eb' }}>
-                      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px', fontWeight: 600 }}>INSPECTOR NOTES:</div>
-                      <div style={{ fontSize: '13px', color: '#374151', fontStyle: 'italic', lineHeight: 1.4 }}>
-                        "{selectedFarmerForView.verificationNotes || 'No notes provided'}"
+            <Box sx={{ p: 4 }}>
+              {selectedFarmerForView ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  
+                  {/* Farmer Info Card */}
+                  <div className="stat-card" style={{ padding: '16px', boxShadow: 'none', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                    <div className="left" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                      <div className="avatar" style={{ background: 'var(--primary-gradient)', color: 'white' }}>
+                        <FaUser />
+                      </div>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>{selectedFarmerForView.name}</h4>
+                        <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#64748b' }}>{selectedFarmerForView.location}</p>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-                  <button onClick={closeView} style={{ padding: '8px 20px', borderRadius: '6px', border: '1px solid #d1d5db', background: 'white', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>Close</button>
+                  {/* Summary Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="card" style={{ padding: '16px', boxShadow: 'none', background: '#f0fdf4', border: '1px solid #dcfce7' }}>
+                      <p style={{ fontSize: '11px', fontWeight: 700, color: '#166534', textTransform: 'uppercase', marginBottom: '4px' }}>Status</p>
+                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#15803d' }}>{selectedFarmerForView.status}</h3>
+                    </div>
+                    <div className="card" style={{ padding: '16px', boxShadow: 'none', background: '#eff6ff', border: '1px solid #dbeafe' }}>
+                      <p style={{ fontSize: '11px', fontWeight: 700, color: '#1e40af', textTransform: 'uppercase', marginBottom: '4px' }}>Crop ID</p>
+                      <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#1d4ed8' }}>{selectedFarmerForView.nod_id}</h3>
+                    </div>
+                  </div>
+
+                  {/* Report Section */}
+                  <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                    <div style={{ background: '#f8fafc', padding: '12px 20px', borderBottom: '1px solid #e2e8f0' }}>
+                      <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: '#475569' }}>Verification Report</h4>
+                    </div>
+                    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div className="monthly-row" style={{ padding: '8px 0' }}>
+                        <span className="monthly-label">Inspected By</span>
+                        <strong className="monthly-value">{selectedFarmerForView.verifiedBy || 'Not Verified'}</strong>
+                      </div>
+                      <div className="monthly-row" style={{ padding: '8px 0' }}>
+                        <span className="monthly-label">Date</span>
+                        <strong className="monthly-value">{selectedFarmerForView.verifiedAt ? new Date(selectedFarmerForView.verifiedAt).toLocaleDateString() : 'N/A'}</strong>
+                      </div>
+                      <div className="monthly-row" style={{ padding: '8px 0', border: 'none' }}>
+                        <span className="monthly-label">Condition</span>
+                        <span className={`badge ${selectedFarmerForView.verificationCondition === 'good' ? 'green' : selectedFarmerForView.verificationCondition === 'average' ? 'orange' : 'red'}`}>
+                          {selectedFarmerForView.verificationCondition || 'N/A'}
+                        </span>
+                      </div>
+                      
+                      {selectedFarmerForView.verificationNotes && (
+                        <div style={{ marginTop: '12px', padding: '16px', background: '#f8fafc', borderRadius: '12px', borderLeft: '4px solid #cbd5e1' }}>
+                          <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Inspector Notes</p>
+                          <p style={{ margin: 0, fontSize: '13px', color: '#475569', fontStyle: 'italic', lineHeight: 1.5 }}>
+                            "{selectedFarmerForView.verificationNotes}"
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                    <button className="btn" onClick={closeView} style={{ padding: '10px 30px' }}>Close</button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <Typography>Loading farmer details...</Typography>
-            )}
+              ) : (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                  Loading farmer details...
+                </div>
+              )}
+            </Box>
           </Box>
         </Modal>
 
@@ -972,46 +1030,62 @@ function Farmeradminpanel() {
           <div className="analytics">
 
             <div className="monthly-card">
-              <h2>Monthly Performance</h2>
-              <p className='monthly-p'>Total Deliveries <strong style={{ marginLeft: '3rem' }}>156</strong></p>
-              <p className='monthly-p'>Average Delivery Time <strong>2.4 hours</strong></p>
-              <p className='monthly-p'>Total Volume Processed <strong>4,250 tons</strong></p>
-              <p className='monthly-p'>Payment Settlement Rate <strong className='text-center'>98.5%</strong></p>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px', color: '#0f172a' }}>Monthly Performance</h2>
+              <div className="monthly-row">
+                <span className="monthly-label">Total Deliveries</span>
+                <strong className="monthly-value">156</strong>
+              </div>
+              <div className="monthly-row">
+                <span className="monthly-label">Average Delivery Time</span>
+                <strong className="monthly-value">2.4 hours</strong>
+              </div>
+              <div className="monthly-row">
+                <span className="monthly-label">Total Volume Processed</span>
+                <strong className="monthly-value">4,250 tons</strong>
+              </div>
+              <div className="monthly-row">
+                <span className="monthly-label">Payment Settlement Rate</span>
+                <strong className="monthly-value">98.5%</strong>
+              </div>
             </div>
 
             <div className="card">
-              <h2>Top Performing Farmers</h2>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px', color: '#0f172a' }}>Top Performing Farmers</h2>
 
-              <div className="rank">
-                <span>1</span>
-                <div style={{ position: "absolute", left: 72 }}>
-                  <h4>Suresh Patil</h4>
-                  <p>Kolhapur</p>
+              <div className="rank-list">
+                <div className="rank-item">
+                  <div className="rank-number">1</div>
+                  <div className="rank-info">
+                    <h4>Suresh Patil</h4>
+                    <p>Kolhapur</p>
+                  </div>
+                  <div className="rank-stat">
+                    <strong>4.3 acres</strong>
+                  </div>
                 </div>
-                <div>
-                  <strong>4.3 acres</strong>
+
+                <div className="rank-item">
+                  <div className="rank-number">2</div>
+                  <div className="rank-info">
+                    <h4>Ramesh Jadhav</h4>
+                    <p>Sangli</p>
+                  </div>
+                  <div className="rank-stat">
+                    <strong>2.8 acres</strong>
+                  </div>
+                </div>
+
+                <div className="rank-item">
+                  <div className="rank-number">3</div>
+                  <div className="rank-info">
+                    <h4>Prakash More</h4>
+                    <p>Satara</p>
+                  </div>
+                  <div className="rank-stat">
+                    <strong>5.2 acres</strong>
+                  </div>
                 </div>
               </div>
-
-              <div className="rank">
-                <span>2</span>
-                <div style={{ position: "absolute", left: 72 }}>
-                  <h4>Ramesh Jadhav</h4>
-                  <p>Sangli</p>
-                </div>
-                <strong style={{ marginLeft: "2rem" }}>2.8 acres</strong>
-
-              </div>
-
-              <div className="rank ">
-                <span>3</span>
-                <div style={{ position: "absolute", left: 72 }}>
-                  <h4>Prakash More</h4>
-                  <p>Satara</p>
-                </div>
-                <strong style={{ marginLeft: "2rem" }}>5.2 acres</strong>
-              </div>
-
             </div>
 
           </div>
@@ -1025,52 +1099,114 @@ function Farmeradminpanel() {
       <Modal
         open={openRecord}
         onClose={closeRecord}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'rgba(15, 23, 42, 0.4)',
+              backdropFilter: 'blur(8px)'
+            }
+          }
+        }}
       >
-        <Box >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: { xs: '94vw', sm: 580 },
+          maxWidth: 580,
+          bgcolor: '#ffffff',
+          borderRadius: '24px',
+          boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
+          outline: 'none',
+          overflow: 'hidden',
+          fontFamily: "'Outfit', sans-serif"
+        }}>
           <div className="fw-modal">
             <div className="fw-header">
               <div className="fw-title">
                 ⚖️ <span>Factory Weighment</span>
               </div>
+              <FaTimes onClick={closeRecord} style={{ cursor: 'pointer', color: '#6b7280', fontSize: '20px' }} />
             </div>
 
-            <div className="fw-delivery-card">
-              <div className="fw-delivery-icon">🚚</div>
-              <div>
-                <div className="fw-delivery-id">Delivery DEL-0001</div>
-                <div className="fw-delivery-meta">
-                  Farmer: Suresh Patil • Crop: CO-265
-                </div>
-              </div>
-            </div>
-
-            <div className="fw-section">
-              <div className="fw-section-title">⚖️ Weighbridge Entry</div>
-
-              <label className="fw-label">
-                Step 1: Gross Weight (Truck + Cane) in Tons <span>*</span>
-              </label>
-              <input
-                type="number"
-                placeholder="e.g., 58.50"
-                className="fw-input fw-input-active"
-              />
-
-              <label className="fw-label">
-                Step 2: Tare Weight (Empty Truck) in Tons <span>*</span>
-              </label>
-              <input
-                type="number"
-                placeholder="e.g., 13.20"
+            <div className="fw-section" style={{ paddingBottom: 0 }}>
+              <label className="fw-label">Select Delivery to Weigh <span>*</span></label>
+              <select
                 className="fw-input"
-              />
+                value={selectedDeliveryForWeighment?.id || ""}
+                onChange={(e) => {
+                  const delivery = pendingWeighments.find(d => d.id === parseInt(e.target.value));
+                  setSelectedDeliveryForWeighment(delivery);
+                }}
+              >
+                <option value="">-- Choose Pending Delivery --</option>
+                {pendingWeighments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    DEL-{String(d.id).padStart(4, '0')} - {d.farmer_name} ({d.vehicle_number})
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <button className="fw-confirm-btn">
-              ✔ Confirm Weighment
-            </button>
+            {selectedDeliveryForWeighment && (
+              <>
+                <div className="fw-delivery-card" style={{ marginTop: '24px' }}>
+                  <div className="fw-delivery-icon">🚚</div>
+                  <div>
+                    <div className="fw-delivery-id">Delivery DEL-{String(selectedDeliveryForWeighment.id).padStart(4, '0')}</div>
+                    <div className="fw-delivery-meta">
+                      Farmer: {selectedDeliveryForWeighment.farmer_name} • Driver: {selectedDeliveryForWeighment.driver_name}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="fw-section" style={{ paddingTop: 0 }}>
+                  <div style={{ borderTop: '1px dashed #e2e8f0', margin: '0 0 24px', paddingBottom: '24px' }}></div>
+                  <h4 style={{ margin: '0 0 20px', fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>⚖️ Weighbridge Entry</h4>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div>
+                      <label className="fw-label">Gross Weight (Tons)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g., 58.50"
+                        className="fw-input"
+                        value={weighmentForm.grossWeight}
+                        onChange={(e) => setWeighmentForm({ ...weighmentForm, grossWeight: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="fw-label">Tare Weight (Tons)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g., 13.20"
+                        className="fw-input"
+                        value={weighmentForm.tareWeight}
+                        onChange={(e) => setWeighmentForm({ ...weighmentForm, tareWeight: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {weighmentForm.grossWeight && weighmentForm.tareWeight && (
+                    <div style={{ marginTop: '24px', padding: '20px', background: '#f0fdf4', borderRadius: '16px', border: '1px solid #dcfce7', textAlign: 'center' }}>
+                      <div style={{ fontSize: '11px', color: '#166534', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Calculated Net Cane Weight</div>
+                      <div style={{ fontSize: '32px', fontWeight: 900, color: '#15803d', marginTop: '4px' }}>
+                        {(parseFloat(weighmentForm.grossWeight) - parseFloat(weighmentForm.tareWeight)).toFixed(2)} <span style={{ fontSize: '16px', fontWeight: 700 }}>Tons</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <button 
+                  className="fw-confirm-btn" 
+                  onClick={handleSubmitWeighment}
+                  disabled={!weighmentForm.grossWeight || !weighmentForm.tareWeight}
+                >
+                  ✔ Confirm & Record Weighment
+                </button>
+              </>
+            )}
           </div>
         </Box>
       </Modal>
@@ -1078,64 +1214,77 @@ function Farmeradminpanel() {
       <Modal
         open={AssignModalOpen}
         onClose={() => setAssignModalOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'rgba(15, 23, 42, 0.4)',
+              backdropFilter: 'blur(8px)'
+            }
+          }
+        }}
       >
-        <Box sx={style}>
-          <div className="drvAssignStaff_overlay">
-            <div className="drvAssignStaff_modal">
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: { xs: '94vw', sm: 540 },
+          bgcolor: '#ffffff',
+          borderRadius: '24px',
+          boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
+          outline: 'none',
+          overflow: 'hidden',
+          fontFamily: "'Outfit', sans-serif"
+        }}>
+          <Box className="fw-header" sx={{ p: '24px 32px !important', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h5" fontWeight={800} sx={{ fontSize: { xs: 20, sm: 24 }, color: '#0f172a', letterSpacing: '-0.02em' }}>
+              Assign Field Staff
+            </Typography>
+            <FaTimes onClick={() => setAssignModalOpen(false)} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
+          </Box>
 
-              {/* Header */}
-              <div className="drvAssignStaff_header">
-                <div className="drvAssignStaff_titleWrap">
-                  <FaUserTie className="drvAssignStaff_icon" />
-                  <h2>Assign Field Staff</h2>
-                </div>
-                <FaTimes className="drvAssignStaff_close" />
+          <Box sx={{ p: 4 }}>
+            {/* Info Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+              <div className="card" style={{ padding: '16px', boxShadow: 'none', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Nodani Ref</p>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>{selectedFarmerForStaff?.nod_id || "Multiple"}</h3>
               </div>
-
-              {/* Info Box */}
-              <div className="drvAssignStaff_infoBox">
-                <div>
-                  <p className="drvAssignStaff_label">Nodani Ref</p>
-                  <h3 className="drvAssignStaff_value">{selectedFarmerForStaff?.nod_id || "Multiple"}</h3>
-                </div>
-
-                <div>
-                  <p className="drvAssignStaff_label">Farmer</p>
-                  <h3 className="drvAssignStaff_value">{selectedFarmerForStaff?.name || "N/A"}</h3>
-                </div>
+              <div className="card" style={{ padding: '16px', boxShadow: 'none', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <p style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>Farmer Name</p>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>{selectedFarmerForStaff?.name || "N/A"}</h3>
               </div>
-
-              {/* Dropdown */}
-              <div className="drvAssignStaff_field">
-                <label>
-                  Select Staff Member <span>*</span>
-                </label>
-
-                <select
-                  className="drvAssignStaff_select"
-                  value={selectedStaff}
-                  onChange={(e) => setSelectedStaff(e.target.value)}
-                >
-                  <option value="">Choose available staff</option>
-                  {staffList.map((staff) => (
-                    <option key={staff.id} value={staff.id}>{staff.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Button */}
-              <button
-                className="drvAssignStaff_btn"
-                disabled={!selectedStaff}
-                onClick={handleAssignStaffSubmit}
-              >
-                <FaCheckCircle /> Assign & Notify Staff
-              </button>
-
             </div>
-          </div>
+
+            {/* Selection Area */}
+            <div className="fw-section">
+              <label className="fw-label" style={{ marginBottom: '10px', display: 'block' }}>
+                Select Staff Member <span>*</span>
+              </label>
+              
+              <select
+                className="fw-input"
+                style={{ width: '100%', cursor: 'pointer' }}
+                value={selectedStaff}
+                onChange={(e) => setSelectedStaff(e.target.value)}
+              >
+                <option value="">Choose available staff</option>
+                {staffList.map((staff) => (
+                  <option key={staff.id} value={staff.id}>{staff.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Action Button */}
+            <button 
+              className="fw-confirm-btn" 
+              style={{ margin: '24px 0 0', width: '100%' }}
+              disabled={!selectedStaff}
+              onClick={handleAssignStaffSubmit}
+            >
+              ✔ Assign & Notify Staff
+            </button>
+          </Box>
         </Box>
       </Modal>
 
@@ -1143,66 +1292,87 @@ function Farmeradminpanel() {
       <Modal
         open={openAddcrops}
         onClose={handleCloseAddcrops}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'rgba(15, 23, 42, 0.4)',
+              backdropFilter: 'blur(8px)'
+            }
+          }
+        }}
       >
         <Box sx={style}>
-          <div className='addCrops-section'>
-            <input type='text' onChange={(e) => setCrops(e.target.value)} value={crops} placeholder='Enter crop' style={{ width: "80%", height: "32px", marginTop: "12px", marginRight: "5px" }} />
-            <button className='buttonHover' style={{ width: "20%" }} onClick={handleCrops}>Add crop</button>
-          </div>
-          <table
-            border="1"
-            cellPadding="10"
-            cellSpacing="0"
-            style={{
-              width: "100%",
-              marginTop: "20px",
-              textAlign: "center"
-            }}
-          >
+          <Box sx={{ p: 3, borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" fontWeight={800} sx={{ fontSize: { xs: 18, sm: 20 }, color: '#0f172a' }}>
+              Manage Crop Types
+            </Typography>
+            <FaTimes onClick={handleCloseAddcrops} style={{ cursor: 'pointer', color: '#64748b' }} />
+          </Box>
 
-            <thead>
-              <tr>
-                <th>Crop Name</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+          <Box sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', gap: 1.5, mb: 3 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Enter new crop name..."
+                value={crops}
+                onChange={(e) => setCrops(e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
+                    bgcolor: '#f8fafc',
+                  }
+                }}
+              />
+              <Button
+                variant="contained"
+                onClick={handleCrops}
+                sx={{
+                  bgcolor: '#059669',
+                  borderRadius: '10px',
+                  px: 3,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  '&:hover': { bgcolor: '#047857' }
+                }}
+              >
+                Add
+              </Button>
+            </Box>
 
-            <tbody>
-
-              {
-                cropsData?.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.crop_name}</td>
-
-                    <td>
-                      <button
-                        onClick={() => handleDeleteCrop(item.id)}
-                        style={{
-                          background: "red",
-                          color: "#fff",
-                          border: "none",
-                          padding: "5px 10px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </td>
-
+            <Box sx={{ maxHeight: '300px', overflowY: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead style={{ background: '#f8fafc', position: 'sticky', top: 0 }}>
+                  <tr>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: 600 }}>Crop Name</th>
+                    <th style={{ padding: '12px', textAlign: 'right', fontSize: '13px', color: '#64748b', fontWeight: 600 }}>Action</th>
                   </tr>
-                ))
-              }
-
-            </tbody>
-
-          </table>
+                </thead>
+                <tbody>
+                  {cropsData.map((crop, i) => (
+                    <tr key={i} style={{ borderTop: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px', fontSize: '14px', fontWeight: 500, color: '#1e293b' }}>{crop.crop_name}</td>
+                      <td style={{ padding: '12px', textAlign: 'right' }}>
+                        <Button
+                          size="small"
+                          color="error"
+                          onClick={() => handleDeleteCrop(crop.id)}
+                          sx={{ textTransform: 'none', fontWeight: 600 }}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Box>
+          </Box>
         </Box>
       </Modal>
 
-    </div>
-  )
-}
+    </>
+  );
+};
 
-export default Farmeradminpanel
+export default Farmeradminpanel;
