@@ -284,6 +284,38 @@ async function ensureDatabaseAndTables() {
   if (!verifiedLatColumnRows.length) {
     await pool.query(`ALTER TABLE nodani ADD COLUMN verified_latitude VARCHAR(100) NULL, ADD COLUMN verified_longitude VARCHAR(100) NULL, ADD COLUMN verification_condition VARCHAR(100) NULL, ADD COLUMN verification_notes TEXT NULL`);
   }
+
+  const [verifiedByColumnRows] = await pool.query(
+    `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'nodani'
+        AND COLUMN_NAME = 'verified_by'
+        LIMIT 1
+        `,
+    [DB_NAME],
+  );
+
+  if (!verifiedByColumnRows.length) {
+    await pool.query(`ALTER TABLE nodani ADD COLUMN verified_by VARCHAR(255) NULL`);
+  }
+
+  const [verifiedAtColumnRows] = await pool.query(
+    `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'nodani'
+        AND COLUMN_NAME = 'verified_at'
+        LIMIT 1
+        `,
+    [DB_NAME],
+  );
+
+  if (!verifiedAtColumnRows.length) {
+    await pool.query(`ALTER TABLE nodani ADD COLUMN verified_at TIMESTAMP NULL`);
+  }
 }
 
 async function registerUser(req, res, fallbackRole) {
@@ -315,6 +347,7 @@ async function registerUser(req, res, fallbackRole) {
 
     return res.send(
       REGISTER_MESSAGES[selectedRole] || "User registered successfully",
+
     );
   } catch (error) {
     if (error && error.code === "ER_DUP_ENTRY") {
@@ -807,7 +840,7 @@ app.put("/assignStaff", async (req, res) => {
 app.put("/submitVerification/:farmerId", async (req, res) => {
   try {
     const { farmerId } = req.params;
-    const { latitude, longitude, condition, notes } = req.body;
+    const { latitude, longitude, condition, notes, verifiedBy } = req.body;
 
     await pool.query(
       `UPDATE nodani SET 
@@ -815,9 +848,11 @@ app.put("/submitVerification/:farmerId", async (req, res) => {
         verified_longitude = ?, 
         verification_condition = ?, 
         verification_notes = ?, 
+        verified_by = ?,
+        verified_at = CURRENT_TIMESTAMP,
         harvest_status = 'ready_for_delivery'
        WHERE farmer_id = ?`,
-      [latitude, longitude, condition, notes, farmerId]
+      [latitude, longitude, condition, notes, verifiedBy, farmerId]
     );
 
     res.json({ message: "Verification submitted successfully" });
@@ -837,9 +872,27 @@ app.get("/staff/dashboard-stats", async (req, res) => {
     `, [staffId]);
     const assignedFarmers = farmerRows[0].count;
 
+    // Field Visits (Verifications today)
+    const [visitRows] = await pool.query(`
+      SELECT COUNT(*) as count FROM nodani 
+      WHERE field_staff_id = ? 
+      AND verified_at >= CURDATE()
+    `, [staffId]);
+    const fieldVisits = visitRows[0].count;
+
+    // Issues Reported (Poor condition today)
+    const [issueRows] = await pool.query(`
+      SELECT COUNT(*) as count FROM nodani 
+      WHERE field_staff_id = ? 
+      AND verified_at >= CURDATE()
+      AND verification_condition = 'poor'
+    `, [staffId]);
+    const issuesReported = issueRows[0].count;
+
     res.json({
       assignedFarmers,
-      fieldVisits: 0,
+      fieldVisits,
+      issuesReported,
       pendingTasks: 0,
       deliveriesAssisted: 0
     });
@@ -881,10 +934,14 @@ app.get("/admin/farmers", async (req, res) => {
         u.name, 
         COUNT(n.id) as crops_count, 
         SUM(CAST(n.area AS DECIMAL(10,2))) as total_area,
-        GROUP_CONCAT(n.harvest_status) as harvest_statuses,
-        GROUP_CONCAT(n.plantation_date) as plantation_dates,
-        GROUP_CONCAT(n.field_name) as field_names,
-        GROUP_CONCAT(n.nod_id) as nod_ids,
+        GROUP_CONCAT(n.harvest_status ORDER BY n.id) as harvest_statuses,
+        GROUP_CONCAT(n.plantation_date ORDER BY n.id) as plantation_dates,
+        GROUP_CONCAT(n.field_name ORDER BY n.id) as field_names,
+        GROUP_CONCAT(n.nod_id ORDER BY n.id) as nod_ids,
+        GROUP_CONCAT(IFNULL(n.verified_by, '') ORDER BY n.id) as verifiers,
+        GROUP_CONCAT(IFNULL(n.verification_notes, '') ORDER BY n.id) as v_notes,
+        GROUP_CONCAT(IFNULL(n.verified_at, '') ORDER BY n.id) as v_dates,
+        GROUP_CONCAT(IFNULL(n.verification_condition, '') ORDER BY n.id) as v_conditions,
         MAX(n.field_staff_id) as max_field_staff_id
       FROM users u
       LEFT JOIN nodani n ON u.id = n.farmer_id
@@ -909,10 +966,26 @@ app.get("/admin/farmers", async (req, res) => {
       const statuses = row.harvest_statuses ? row.harvest_statuses.split(',') : [];
       const dates = row.plantation_dates ? row.plantation_dates.split(',') : [];
       const nod_ids = row.nod_ids ? row.nod_ids.split(',') : [];
+      const verifiers = row.verifiers ? row.verifiers.split(',') : [];
+      const v_notes = row.v_notes ? row.v_notes.split(',') : [];
+      const v_dates = row.v_dates ? row.v_dates.split(',') : [];
+      const v_conditions = row.v_conditions ? row.v_conditions.split(',') : [];
+
+      let verifiedBy = null;
+      let verificationNotes = null;
+      let verifiedAt = null;
+      let verificationCondition = null;
 
       if (statuses.includes('ready_for_delivery')) {
         status = "VERIFIED & READY";
         color = "purple";
+        const idx = statuses.indexOf('ready_for_delivery');
+        if (idx !== -1) {
+          verifiedBy = verifiers[idx] || null;
+          verificationNotes = v_notes[idx] || null;
+          verifiedAt = v_dates[idx] || null;
+          verificationCondition = v_conditions[idx] || null;
+        }
       } else if (statuses.includes('declared')) {
         status = "HARVEST READY";
         color = "green";
@@ -946,7 +1019,11 @@ app.get("/admin/farmers", async (req, res) => {
         crops: row.crops_count || 0,
         area: (row.total_area || 0) + " acres",
         status: status,
-        color: color
+        color: color,
+        verifiedBy: verifiedBy,
+        verificationNotes: verificationNotes,
+        verifiedAt: verifiedAt,
+        verificationCondition: verificationCondition
       };
     });
 

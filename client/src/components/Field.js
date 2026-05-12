@@ -82,9 +82,9 @@ function Field() {
       staffId: user?.id,
       staffName: user?.name,
       date: new Date().toISOString(),
-      farmsVisited: 3,
-      issuesReported: 2,
-      deliveriesVerified: 1,
+      farmsVisited: dashboardStats.fieldVisits,
+      issuesReported: dashboardStats.issuesReported,
+      deliveriesVerified: dashboardStats.deliveriesAssisted,
     };
 
     try {
@@ -103,6 +103,62 @@ function Field() {
     } catch (error) {
       console.error("Error submitting daily report:", error);
       alert("An error occurred. Please check your connection.");
+    }
+  };
+
+  const fetchFarmers = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/admin/farmers?staffId=" + user.id);
+      const data = await response.json();
+
+      const formattedData = data.map(f => ({
+        id: f.id,
+        name: f.name,
+        location: f.location,
+        crops: `${f.crops} crops`,
+        lastVisit: new Date().toLocaleDateString(), 
+        status: f.status,
+        statusType: f.color === "green" ? "success" : f.color === "orange" ? "warning" : "info",
+        note: f.max_field_staff_id ? "Assigned by Factory Admin" : (f.status === "HARVEST READY" ? "Pickup verification required" : f.status === "PEST CONTROL NEEDED" ? "Field inspection due" : "Scheduled visit in 2 days"),
+      }));
+      setFarmers(formattedData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/staff/dashboard-stats?staffId=" + user.id);
+      const data = await response.json();
+      setDashboardStats({
+        assignedFarmers: data.assignedFarmers || 0,
+        fieldVisits: data.fieldVisits || 0,
+        issuesReported: data.issuesReported || 0,
+        pendingTasks: data.pendingTasks || 0,
+        deliveriesAssisted: data.deliveriesAssisted || 0,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchDeliveries = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/get-deliveries?staffId=" + user.id);
+      const data = await response.json();
+      const formattedDeliveries = data.map(d => ({
+        id: "DEL-" + String(d.id).padStart(4, '0'),
+        farmer: d.farmer_name,
+        driver: d.driver_name,
+        weight: d.weight || "Pending",
+        status: d.status,
+        statusType: d.status === "COMPLETED" ? "success" : d.status === "PICKUP IN-PROGRESS" ? "warning" : "info",
+        note: d.status === "SCHEDULED" ? "Standby" : "Action Required"
+      }));
+      setDeliveries(formattedDeliveries);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -126,14 +182,15 @@ function Field() {
           longitude: gpsLocation.lng,
           condition: form.condition,
           notes: form.notes,
-          checklist: checklist
+          checklist: checklist,
+          verifiedBy: user?.name
         })
       });
       if (response.ok) {
         alert("Verification report submitted successfully!");
         handleClose();
-        // Optional: refresh farmers list
-        // window.location.reload(); 
+        fetchFarmers();
+        fetchStats();
       } else {
         alert("Failed to submit report.");
       }
@@ -143,59 +200,6 @@ function Field() {
   };
 
   React.useEffect(() => {
-    const fetchFarmers = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/admin/farmers?staffId=" + user.id);
-        const data = await response.json();
-
-        const formattedData = data.map(f => ({
-          name: f.name,
-          location: f.location,
-          crops: `${f.crops} crops`,
-          lastVisit: new Date().toLocaleDateString(), // Mocking last visit for now
-          status: f.status,
-          statusType: f.color === "green" ? "success" : f.color === "orange" ? "warning" : "info",
-          note: f.max_field_staff_id ? "Assigned by Factory Admin" : (f.status === "HARVEST READY" ? "Pickup verification required" : f.status === "PEST CONTROL NEEDED" ? "Field inspection due" : "Scheduled visit in 2 days"),
-        }));
-        setFarmers(formattedData);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const fetchStats = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/staff/dashboard-stats?staffId=" + user.id);
-        const data = await response.json();
-        setDashboardStats({
-          assignedFarmers: data.assignedFarmers || 0,
-          fieldVisits: data.fieldVisits || 0,
-          pendingTasks: data.pendingTasks || 0,
-          deliveriesAssisted: data.deliveriesAssisted || 0,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchDeliveries = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/get-deliveries?staffId=" + user.id);
-        const data = await response.json();
-        const formattedDeliveries = data.map(d => ({
-          id: "DEL-" + String(d.id).padStart(4, '0'),
-          farmer: d.farmer_name,
-          driver: d.driver_name,
-          weight: d.weight || "Pending",
-          status: d.status,
-          statusType: d.status === "COMPLETED" ? "success" : d.status === "PICKUP IN-PROGRESS" ? "warning" : "info",
-          note: d.status === "SCHEDULED" ? "Standby" : "Action Required"
-        }));
-        setDeliveries(formattedDeliveries);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchFarmers();
     fetchStats();
     fetchDeliveries();
@@ -206,6 +210,7 @@ function Field() {
   const [dashboardStats, setDashboardStats] = React.useState({
     assignedFarmers: 0,
     fieldVisits: 0,
+    issuesReported: 0,
     pendingTasks: 0,
     deliveriesAssisted: 0
   });
@@ -380,13 +385,13 @@ function Field() {
               <div className="fm-report-card">
                 <h2 className="fm-title">Today's Field Report</h2>
                 <div className="fm-report-item">
-                  <span>Farms Visited</span> <strong>3</strong>
+                  <span>Farms Visited</span> <strong>{dashboardStats.fieldVisits}</strong>
                 </div>
                 <div className="fm-report-item warning">
-                  <span>Issues Reported</span> <strong>2</strong>
+                  <span>Issues Reported</span> <strong>{dashboardStats.issuesReported}</strong>
                 </div>
                 <div className="fm-report-item">
-                  <span>Deliveries Verified</span> <strong>1</strong>
+                  <span>Deliveries Verified</span> <strong>{dashboardStats.deliveriesAssisted}</strong>
                 </div>
                 <button className="fm-btn fm-btn-primary fm-full" onClick={handleSubmitDailyReport}>
                   <FileText size={14} style={{ display: 'inline', marginRight: 4 }} /> Submit Daily Report

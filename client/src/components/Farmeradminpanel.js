@@ -563,6 +563,17 @@ function Farmeradminpanel() {
   const [openRecord, setOpenRecord] = useState(false);
   const [AssignModalOpen, setAssignModalOpen] = useState(false);
 
+  const [openView, setopenView] = useState(false)
+  const [selectedFarmerForView, setSelectedFarmerForView] = useState(null)
+  const openViewmodel = (f) => {
+    setSelectedFarmerForView(f);
+    setopenView(true);
+  }
+  const closeView = () => {
+    setopenView(false);
+    setSelectedFarmerForView(null);
+  }
+
   const handleRecord = () => setOpenRecord(true);
   const closeRecord = () => setOpenRecord(false)
 
@@ -837,14 +848,99 @@ function Farmeradminpanel() {
                 </div>
 
                 <div className="right">
-                  <span className={`badge ${f.color}`}>{f.status}</span>
-                  <button className='buttonHover'><FaEye /> View</button>
+                  <span style={{ marginbottom: 0 }} className={`badge ${f.color}`}>{f.status}</span>
+                  {f.status === "VERIFIED & READY" && f.verifiedBy && (
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', textAlign: 'right' }}>
+                      Verified by: <strong>{f.verifiedBy}</strong>
+                    </div>
+                  )}
+                  <button className='buttonHover' onClick={() => openViewmodel(f)}><FaEye /> View</button>
                   <button className='buttonHover' onClick={() => { setSelectedFarmerForStaff(f); setAssignModalOpen(true); }}><FaUserPlus /> Assign Staff</button>
                 </div>
               </div>
             ))}
           </div>
         )}
+        <Modal
+          open={openView}
+          onClose={closeView}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={{ ...style, width: { xs: '95vw', sm: 500 } }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+              <Typography id="modal-modal-title" variant="h6" fontWeight={700} color="#1f2937">
+                Inspection Details
+              </Typography>
+              <FaTimes onClick={closeView} style={{ cursor: 'pointer', color: '#6b7280' }} />
+            </div>
+
+            {selectedFarmerForView ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
+                  <div style={{ background: '#3b82f6', color: 'white', padding: '8px', borderRadius: '50%', display: 'flex' }}><FaUser /></div>
+                  <div>
+                    <div style={{ fontWeight: 600, color: '#1f2937' }}>{selectedFarmerForView.name}</div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{selectedFarmerForView.location}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div style={{ background: '#f0fdf4', padding: '12px', borderRadius: '8px', border: '1px solid #dcfce7' }}>
+                    <div style={{ fontSize: '11px', color: '#166534', fontWeight: 600, textTransform: 'uppercase' }}>Status</div>
+                    <div style={{ fontWeight: 600, color: '#15803d', marginTop: '4px' }}>{selectedFarmerForView.status}</div>
+                  </div>
+                  <div style={{ background: '#eff6ff', padding: '12px', borderRadius: '8px', border: '1px solid #dbeafe' }}>
+                    <div style={{ fontSize: '11px', color: '#1e40af', fontWeight: 600, textTransform: 'uppercase' }}>Crop ID</div>
+                    <div style={{ fontWeight: 600, color: '#1d4ed8', marginTop: '4px' }}>{selectedFarmerForView.nod_id}</div>
+                  </div>
+                </div>
+
+                <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+                  <div style={{ background: '#f9fafb', padding: '10px 12px', borderBottom: '1px solid #e5e7eb', fontWeight: 600, fontSize: '13px', color: '#374151' }}>
+                    Verification Report
+                  </div>
+                  <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                      <span style={{ color: '#6b7280' }}>Inspected By:</span>
+                      <strong style={{ color: '#111827' }}>{selectedFarmerForView.verifiedBy || 'Not Verified'}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                      <span style={{ color: '#6b7280' }}>Date:</span>
+                      <strong style={{ color: '#111827' }}>{selectedFarmerForView.verifiedAt ? new Date(selectedFarmerForView.verifiedAt).toLocaleDateString() : 'N/A'}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                      <span style={{ color: '#6b7280' }}>Condition:</span>
+                      <span style={{ 
+                        padding: '2px 8px', 
+                        borderRadius: '12px', 
+                        fontSize: '11px', 
+                        fontWeight: 700,
+                        background: selectedFarmerForView.verificationCondition === 'good' ? '#dcfce7' : selectedFarmerForView.verificationCondition === 'average' ? '#fef9c3' : '#fee2e2',
+                        color: selectedFarmerForView.verificationCondition === 'good' ? '#166534' : selectedFarmerForView.verificationCondition === 'average' ? '#854d0e' : '#991b1b',
+                        textTransform: 'capitalize'
+                      }}>
+                        {selectedFarmerForView.verificationCondition || 'N/A'}
+                      </span>
+                    </div>
+                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #e5e7eb' }}>
+                      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px', fontWeight: 600 }}>INSPECTOR NOTES:</div>
+                      <div style={{ fontSize: '13px', color: '#374151', fontStyle: 'italic', lineHeight: 1.4 }}>
+                        "{selectedFarmerForView.verificationNotes || 'No notes provided'}"
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                  <button onClick={closeView} style={{ padding: '8px 20px', borderRadius: '6px', border: '1px solid #d1d5db', background: 'white', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>Close</button>
+                </div>
+              </div>
+            ) : (
+              <Typography>Loading farmer details...</Typography>
+            )}
+          </Box>
+        </Modal>
 
         {/* DELIVERIES */}
         {tab === "deliveries" && (

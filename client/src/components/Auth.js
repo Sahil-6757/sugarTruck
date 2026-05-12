@@ -157,6 +157,14 @@ const Auth = () => {
         else if (user.role === "Driver") {
           navigation("/driver");
         }
+        setTab("login")
+        setErrors({});
+        setForm({
+          name: "",
+          phone: "",
+          email: "",
+          password: "",
+        });
       })
       .catch((error) => {
         alert(error?.response?.data || "Request failed");
