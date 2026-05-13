@@ -301,6 +301,22 @@ async function ensureDatabaseAndTables() {
     await pool.query(`ALTER TABLE nodani ADD COLUMN verified_by VARCHAR(255) NULL`);
   }
 
+  const [verifiedImgColumnRows] = await pool.query(
+    `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'nodani'
+        AND COLUMN_NAME = 'verification_image'
+        LIMIT 1
+        `,
+    [DB_NAME],
+  );
+
+  if (!verifiedImgColumnRows.length) {
+    await pool.query(`ALTER TABLE nodani ADD COLUMN verification_image LONGTEXT NULL`);
+  }
+
   const [verifiedAtColumnRows] = await pool.query(
     `
         SELECT COLUMN_NAME
@@ -904,7 +920,7 @@ app.put("/assignStaff", async (req, res) => {
 app.put("/submitVerification/:farmerId", async (req, res) => {
   try {
     const { farmerId } = req.params;
-    const { latitude, longitude, condition, notes, verifiedBy } = req.body;
+    const { latitude, longitude, condition, notes, verifiedBy, image } = req.body;
 
     await pool.query(
       `UPDATE nodani SET 
@@ -913,10 +929,11 @@ app.put("/submitVerification/:farmerId", async (req, res) => {
         verification_condition = ?, 
         verification_notes = ?, 
         verified_by = ?,
+        verification_image = ?,
         verified_at = CURRENT_TIMESTAMP,
         harvest_status = 'ready_for_delivery'
        WHERE farmer_id = ?`,
-      [latitude, longitude, condition, notes, verifiedBy, farmerId]
+      [latitude, longitude, condition, notes, verifiedBy, image, farmerId]
     );
 
     res.json({ message: "Verification submitted successfully" });
@@ -977,11 +994,25 @@ app.get("/admin/dashboard-stats", async (req, res) => {
     const [deliveryRows] = await pool.query(`SELECT COUNT(*) as count FROM deliveries WHERE status != 'COMPLETED'`);
     const pendingDeliveries = deliveryRows[0].count;
 
+    const [monthlyRows] = await pool.query(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'COMPLETED' THEN 1 ELSE 0 END) as completed,
+        SUM(CAST(NULLIF(weight, 'Pending') AS DECIMAL(10,2))) as total_weight
+      FROM deliveries
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+    `);
+
+    const monthlyStats = monthlyRows[0];
+
     res.json({
       totalFarmers,
       activeCrops,
       pendingDeliveries,
-      monthlyRevenue: "₹0.0L"
+      monthlyRevenue: "₹" + ((monthlyStats.total_weight || 0) * 0.032).toFixed(1) + "L",
+      monthlyDeliveries: monthlyStats.total || 0,
+      completedDeliveries: monthlyStats.completed || 0,
+      totalTons: (monthlyStats.total_weight || 0).toFixed(2)
     });
   } catch (error) {
     console.error(error);

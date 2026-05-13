@@ -130,7 +130,7 @@ function Cropdetails() {
 
 {/* TOP */}
 <div className="top-bar">
-  <button className="back-btn" style={{width:"auto"}} onClick={()=>navigation('/farmer')}>← Back to Dashboard</button>
+  <button className="back-btn" onClick={()=>navigation('/farmer')}>← Back to Dashboard</button>
   <div className="title">
     <h2>{data.name}</h2>
     <p>Crop ID: {data.cropId}</p>
@@ -183,7 +183,7 @@ function Cropdetails() {
       <div className="loc-row">
         <FaMapMarkerAlt />
         <span>{data.location}</span>
-        <button style={{width:"auto"}} className="map-btn buttonHover">View on Map</button>
+        <button className="map-btn buttonHover">View on Map</button>
       </div>
     </div>
 

@@ -17,11 +17,12 @@ function Farmer() {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: { xs: '94vw', sm: 400 },
     bgcolor: 'background.paper',
-    border: '1px solid #000',
+    borderRadius: '12px',
     boxShadow: 24,
     p: 4,
+    outline: 'none'
   };
   const [open, setOpen] = useState(false);
   const [openRate, setOpenRate] = useState(false);
@@ -570,13 +571,13 @@ function Farmer() {
               <div className="stats">
 
                 <div className="card">
-                  <p style={{ marginLeft: "-8px" }}>Total Crops</p>
+                  <p>Total Crops</p>
                   <h2 className='frm-Dashboard'>{crops.length}</h2>
                   <FaSeedling className="icon" />
                 </div>
 
                 <div className="card">
-                  <p style={{ marginLeft: "-8px" }}>Total Area</p>
+                  <p>Total Area</p>
                   <h2 className='frm-Dashboard'>
                     {crops.reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0)} acres
                   </h2>
@@ -584,13 +585,13 @@ function Farmer() {
                 </div>
 
                 <div className="card">
-                  <p style={{ marginLeft: "-8px" }}>Active Deliveries</p>
+                  <p>Active Deliveries</p>
                   <h2 className='frm-Dashboard'>{dashboardStats.deliveries}</h2>
                   <FaTruck className="icon" />
                 </div>
 
                 <div className="card">
-                  <p style={{ marginLeft: "-8px" }}>Total Earnings</p>
+                  <p>Total Earnings</p>
                   <h2 className='frm-Dashboard'>{dashboardStats.earnings}</h2>
                   <FaDollarSign className="icon" />
                 </div>
@@ -598,7 +599,7 @@ function Farmer() {
               </div>
 
               {/* TABS */}
-              <div className="tabs" style={{ minInlineSize: '-webkit-fill-available' }}>
+              <div className="tabs">
                 <button className="active">Overview</button>
                 <button onClick={() => navigation('/crop-detail')}>Crop Details</button>
                 <button onClick={() => navigation('/delivery')}>Deliveries</button>

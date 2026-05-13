@@ -27,10 +27,13 @@ import {
 const style = {
   position: 'absolute',
   top: '50%',
-  left: '50%',
+  left: '46%',
   transform: 'translate(-50%, -50%)',
   width: { xs: '94vw', sm: 580 },
   maxWidth: 580,
+  maxHeight: '90vh',
+  display: 'flex',
+  flexDirection: 'column',
   bgcolor: '#ffffff',
   borderRadius: '24px',
   boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
@@ -145,6 +148,9 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: { xs: '94vw', sm: 640 },
+        maxHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
         bgcolor: '#ffffff',
         borderRadius: '24px',
         boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
@@ -159,9 +165,9 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
           <FaTimes onClick={handleClose} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
         </Box>
 
-        <Box sx={{ p: 4 }}>
+        <Box sx={{ p: 4, overflowY: 'auto', flex: 1 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            
+
             {/* Farmer Selection Section */}
             <div className="fw-section" style={{ padding: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
@@ -174,10 +180,10 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <label className="fw-label">Harvest Ready (Quick)</label>
-                  <select 
-                    className="fw-input" 
-                    name="farmer" 
-                    value={form.farmer} 
+                  <select
+                    className="fw-input"
+                    name="farmer"
+                    value={form.farmer}
                     onChange={handleChange}
                   >
                     <option value="">Choose ready farmer</option>
@@ -188,10 +194,10 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
                 </div>
                 <div>
                   <label className="fw-label">Search All Farmers <span>*</span></label>
-                  <select 
-                    className="fw-input" 
-                    name="farmer" 
-                    value={form.farmer} 
+                  <select
+                    className="fw-input"
+                    name="farmer"
+                    value={form.farmer}
                     onChange={handleChange}
                   >
                     <option value="">Select farmer</option>
@@ -259,8 +265,8 @@ const DispatchModal = ({ open, handleClose, onSuccess }) => {
               </div>
             </div>
 
-            <button 
-              className="fw-confirm-btn" 
+            <button
+              className="fw-confirm-btn"
               style={{ width: '100%', margin: '16px 0 0' }}
               onClick={handleSubmit}
             >
@@ -346,6 +352,9 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: { xs: '94vw', sm: 700 },
+        maxHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
         bgcolor: '#ffffff',
         borderRadius: '24px',
         boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
@@ -360,7 +369,7 @@ const FarmerRegistrationModal = ({ open, handleClose }) => {
           <FaTimes onClick={handleClose} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
         </Box>
 
-        <div className="fr-container">
+        <div className="fr-container" style={{ overflowY: 'auto', flex: 1 }}>
 
           {/* Stepper */}
           <div className="fr-stepper">
@@ -655,6 +664,8 @@ function Farmeradminpanel() {
         tons: d.weight || "Pending",
         route: "Field → Factory",
         status: d.status,
+        date: d.delivery_date ? new Date(d.delivery_date).toLocaleDateString() : 'N/A',
+        time: d.delivery_time || 'N/A',
         color: d.status === "COMPLETED" ? "green" : d.status === "SCHEDULED" ? "orange" : "blue"
       })));
     } catch (error) {
@@ -772,9 +783,9 @@ function Farmeradminpanel() {
       color: "blue",
     },
     {
-      title: "Pending Deliveries",
+      title: "Active Deliveries",
       value: dashboardStats.pendingDeliveries,
-      sub: "Requires attention",
+      sub: "Currently in transit",
       icon: <FaTruck />,
       color: "orange",
     },
@@ -800,8 +811,8 @@ function Farmeradminpanel() {
 
   return (
     <>
+      <Navbar />
       <div className="admin-page">
-        <Navbar />
 
         {/* HEADER */}
         <div className="admin-header">
@@ -881,7 +892,7 @@ function Farmeradminpanel() {
                 </div>
 
                 <div className="right">
-                  <span className={`badge ${f.color}`}>{f.status}</span>
+                  <span style={{ marginBottom: "0px" }} className={`badge ${f.color}`}>{f.status}</span>
                   {f.status === "VERIFIED & READY" && f.verifiedBy && (
                     <div style={{ fontSize: '11px', color: '#6b7280', textAlign: 'right', marginTop: "6px" }}>
                       Verified by: <strong>{f.verifiedBy}</strong>
@@ -912,6 +923,9 @@ function Farmeradminpanel() {
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: { xs: '94vw', sm: 520 },
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
             bgcolor: 'background.paper',
             borderRadius: '24px',
             boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
@@ -926,10 +940,10 @@ function Farmeradminpanel() {
               <FaTimes onClick={closeView} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
             </Box>
 
-            <Box sx={{ p: 4 }}>
+            <Box sx={{ p: 4, overflowY: 'auto', flex: 1 }}>
               {selectedFarmerForView ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  
+
                   {/* Farmer Info Card */}
                   <div className="stat-card" style={{ padding: '16px', boxShadow: 'none', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
                     <div className="left" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -975,7 +989,7 @@ function Farmeradminpanel() {
                           {selectedFarmerForView.verificationCondition || 'N/A'}
                         </span>
                       </div>
-                      
+
                       {selectedFarmerForView.verificationNotes && (
                         <div style={{ marginTop: '12px', padding: '16px', background: '#f8fafc', borderRadius: '12px', borderLeft: '4px solid #cbd5e1' }}>
                           <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Inspector Notes</p>
@@ -1012,12 +1026,14 @@ function Farmeradminpanel() {
                   <div>
                     <h4>{d.id}</h4>
                     <p>{d.farmer} • {d.driver} • {d.tons} tons</p>
-                    <p>{d.route}</p>
+                    <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                      <FaMapMarkerAlt style={{ fontSize: '10px' }} /> {d.route} &nbsp;•&nbsp; 🗓️ {d.date} at {d.time}
+                    </p>
                   </div>
                 </div>
 
                 <div className="right">
-                  <span className={`badge ${d.color}`}>{d.status}</span>
+                  <span style={{ marginBottom: "0px" }} className={`badge ${d.color}`}>{d.status}</span>
                   <button className='buttonHover'>Track Live</button>
                 </div>
               </div>
@@ -1033,15 +1049,15 @@ function Farmeradminpanel() {
               <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px', color: '#0f172a' }}>Monthly Performance</h2>
               <div className="monthly-row">
                 <span className="monthly-label">Total Deliveries</span>
-                <strong className="monthly-value">156</strong>
+                <strong className="monthly-value">{dashboardStats.monthlyDeliveries || 0}</strong>
               </div>
               <div className="monthly-row">
-                <span className="monthly-label">Average Delivery Time</span>
-                <strong className="monthly-value">2.4 hours</strong>
+                <span className="monthly-label">Completed Deliveries</span>
+                <strong className="monthly-value" style={{ color: '#059669' }}>{dashboardStats.completedDeliveries || 0}</strong>
               </div>
               <div className="monthly-row">
                 <span className="monthly-label">Total Volume Processed</span>
-                <strong className="monthly-value">4,250 tons</strong>
+                <strong className="monthly-value">{dashboardStats.totalTons || 0} tons</strong>
               </div>
               <div className="monthly-row">
                 <span className="monthly-label">Payment Settlement Rate</span>
@@ -1115,6 +1131,9 @@ function Farmeradminpanel() {
           transform: 'translate(-50%, -50%)',
           width: { xs: '94vw', sm: 580 },
           maxWidth: 580,
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
           bgcolor: '#ffffff',
           borderRadius: '24px',
           boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
@@ -1122,12 +1141,11 @@ function Farmeradminpanel() {
           overflow: 'hidden',
           fontFamily: "'Outfit', sans-serif"
         }}>
-          <div className="fw-modal">
+          <div className="fw-modal" style={{ overflowY: 'auto', flex: 1 }}>
             <div className="fw-header">
               <div className="fw-title">
                 ⚖️ <span>Factory Weighment</span>
               </div>
-              <FaTimes onClick={closeRecord} style={{ cursor: 'pointer', color: '#6b7280', fontSize: '20px' }} />
             </div>
 
             <div className="fw-section" style={{ paddingBottom: 0 }}>
@@ -1198,8 +1216,8 @@ function Farmeradminpanel() {
                   )}
                 </div>
 
-                <button 
-                  className="fw-confirm-btn" 
+                <button
+                  className="fw-confirm-btn"
                   onClick={handleSubmitWeighment}
                   disabled={!weighmentForm.grossWeight || !weighmentForm.tareWeight}
                 >
@@ -1229,6 +1247,9 @@ function Farmeradminpanel() {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           width: { xs: '94vw', sm: 540 },
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
           bgcolor: '#ffffff',
           borderRadius: '24px',
           boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.25)',
@@ -1243,7 +1264,7 @@ function Farmeradminpanel() {
             <FaTimes onClick={() => setAssignModalOpen(false)} style={{ cursor: 'pointer', color: '#64748b', fontSize: '20px' }} />
           </Box>
 
-          <Box sx={{ p: 4 }}>
+          <Box sx={{ p: 4, overflowY: 'auto', flex: 1 }}>
             {/* Info Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
               <div className="card" style={{ padding: '16px', boxShadow: 'none', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
@@ -1261,7 +1282,7 @@ function Farmeradminpanel() {
               <label className="fw-label" style={{ marginBottom: '10px', display: 'block' }}>
                 Select Staff Member <span>*</span>
               </label>
-              
+
               <select
                 className="fw-input"
                 style={{ width: '100%', cursor: 'pointer' }}
@@ -1276,8 +1297,8 @@ function Farmeradminpanel() {
             </div>
 
             {/* Action Button */}
-            <button 
-              className="fw-confirm-btn" 
+            <button
+              className="fw-confirm-btn"
               style={{ margin: '24px 0 0', width: '100%' }}
               disabled={!selectedStaff}
               onClick={handleAssignStaffSubmit}

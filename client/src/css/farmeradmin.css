@@ -21,7 +21,7 @@
 }
 
 .admin-page {
-  padding: 24px 40px;
+  padding: 24px 20px;
   background: var(--slate-50);
   font-family: 'Outfit', sans-serif;
   color: var(--slate-800);
@@ -34,6 +34,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .admin-header h1 {
@@ -146,6 +148,8 @@
   justify-content: space-between;
   align-items: center;
   border: 1px solid transparent;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .row .left {
@@ -486,7 +490,6 @@ button.buttonHover:hover {
 
 .fr-form-box {
   padding: 32px 40px;
-  min-height: 340px;
 }
 
 .fr-section-title {
@@ -512,6 +515,7 @@ button.buttonHover:hover {
 .fr-mobile-row {
   display: flex;
   gap: 12px;
+  align-items: baseline;
 }
 
 .fr-prefix {
@@ -565,4 +569,119 @@ button.buttonHover:hover {
 .fr-btn-green:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 12px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .analytics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-page {
+    padding: 15px;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-header .actions {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    width: 100%;
+    padding-bottom: 5px;
+  }
+
+  .tabs button {
+    white-space: nowrap;
+    padding: 8px 16px;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .row .right {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  /* Modal Adjustments */
+  .fr-stepper {
+    padding: 20px;
+  }
+
+  .fr-step-line {
+    left: 40px;
+    right: 40px;
+    top: 40px;
+  }
+
+  .fr-step-label {
+    display: none;
+  }
+
+  .fr-form-box {
+    padding: 20px;
+  }
+
+  .fr-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .fr-field.fr-full {
+    grid-column: span 1;
+  }
+
+  .fw-header,
+  .fw-section,
+  .fw-delivery-card,
+  .fr-footer {
+    padding: 15px;
+  }
+
+  .fw-input {
+    height: 48px;
+  }
+
+  .fw-confirm-btn {
+    width: calc(100% - 30px);
+    margin: 0 15px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-header h1 {
+    font-size: 22px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-card h2 {
+    font-size: 20px;
+  }
+
+  .icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
 }

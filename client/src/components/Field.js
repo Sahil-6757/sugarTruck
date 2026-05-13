@@ -25,6 +25,7 @@ function Field() {
   const [form, setForm] = useState({
     condition: "",
     notes: "",
+    image: null
   });
 
   const toggleCheck = (key) => {
@@ -32,7 +33,18 @@ function Field() {
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "image") {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setForm({ ...form, image: reader.result });
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
 
@@ -116,7 +128,7 @@ function Field() {
         name: f.name,
         location: f.location,
         crops: `${f.crops} crops`,
-        lastVisit: new Date().toLocaleDateString(), 
+        lastVisit: new Date().toLocaleDateString(),
         status: f.status,
         statusType: f.color === "green" ? "success" : f.color === "orange" ? "warning" : "info",
         note: f.max_field_staff_id ? "Assigned by Factory Admin" : (f.status === "HARVEST READY" ? "Pickup verification required" : f.status === "PEST CONTROL NEEDED" ? "Field inspection due" : "Scheduled visit in 2 days"),
@@ -167,8 +179,21 @@ function Field() {
       alert("Please capture GPS location first.");
       return;
     }
+    const allChecked = Object.values(checklist).every(v => v === true);
+    if (!allChecked) {
+      alert("Please complete the verification checklist.");
+      return;
+    }
+    if (!form.image) {
+      alert("Please upload a field photo.");
+      return;
+    }
     if (!form.condition) {
       alert("Please select overall crop condition.");
+      return;
+    }
+    if (!form.notes) {
+      alert("Please enter field notes.");
       return;
     }
     if (!selectedFarmerToVerify) return;
@@ -183,7 +208,8 @@ function Field() {
           condition: form.condition,
           notes: form.notes,
           checklist: checklist,
-          verifiedBy: user?.name
+          verifiedBy: user?.name,
+          image: form.image
         })
       });
       if (response.ok) {
@@ -191,6 +217,15 @@ function Field() {
         handleClose();
         fetchFarmers();
         fetchStats();
+        setForm({ condition: "", notes: "", image: null });
+        setChecklist({
+          plantation: false,
+          crop: false,
+          area: false,
+          growth: false,
+          pest: false,
+        });
+        setGpsLocation(null);
       } else {
         alert("Failed to submit report.");
       }
@@ -435,7 +470,6 @@ function Field() {
                   Nodani: {selectedFarmerToVerify?.nod_id || "N/A"} • Farmer: {selectedFarmerToVerify?.name || "N/A"}
                 </p>
               </div>
-              <button className="fvr-close" onClick={handleClose}>✕</button>
             </div>
 
             {/* GPS Section */}
@@ -476,15 +510,32 @@ function Field() {
 
             {/* Photo */}
             <div className="fvr-card">
-              <div className="fvr-section-title">📷 Photo Documentation</div>
-              <button className="fvr-btn fvr-btn-outline">
-                ⬆ Capture Photo
+              <div className="fvr-section-title">📷 Photo Documentation (Mandatory)</div>
+              <input
+                type="file"
+                name="image"
+                id="verification-image"
+                accept="image/*"
+                onChange={handleChange}
+                style={{ display: 'none' }}
+              />
+              <button
+                className={`fvr-btn ${form.image ? "fvr-btn-success" : "fvr-btn-outline"}`}
+                onClick={() => document.getElementById('verification-image').click()}
+                style={{ width: '100%', background: form.image ? '#dcfce7' : '' }}
+              >
+                {form.image ? "✔ Photo Captured" : "⬆ Capture Photo"}
               </button>
+              {form.image && (
+                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                  <img src={form.image} alt="Verification" style={{ maxWidth: '100%', borderRadius: '8px', height: '100px', objectFit: 'cover' }} />
+                </div>
+              )}
             </div>
 
             {/* Dropdown */}
             <div className="fvr-field">
-              <label>Overall Crop Condition</label>
+              <label>Overall Crop Condition <span>*</span></label>
               <select
                 name="condition"
                 value={form.condition}
@@ -499,7 +550,7 @@ function Field() {
 
             {/* Notes */}
             <div className="fvr-field">
-              <label>Field Notes</label>
+              <label>Field Notes <span>*</span></label>
               <textarea
                 name="notes"
                 value={form.notes}

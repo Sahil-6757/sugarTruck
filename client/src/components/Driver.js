@@ -112,18 +112,18 @@ function Driver() {
 
   return (
     <>
-      <Navbar />
+      <Navbar role={user.role} />
       <div className="drvDash_container">
         <div className="drvDash_header">
           <div>
             <h1 className="drvDash_title">Driver Dashboard</h1>
             <p className="drvDash_subtitle">Welcome back, {user.name}</p>
           </div>
-          <div className='AddDriver-btn'>
-            <button className='primary' onClick={() => handleOpen()}> Add Driver</button>
-          </div>
-          <div className="drvDash_vehicle" style={{ display: 'flex', gap: '15px' }}>
-            <div>
+          <div className="drvDash_vehicle" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <div className='AddDriver-btn'>
+              <button className='primary buttonHover' onClick={() => handleOpen()}> Add Driver</button>
+            </div>
+            <div style={{ textAlign: 'right' }}>
               <span className="drvDash_vehicleLabel">Vehicle Number</span>
               <span className="drvDash_vehicleNumber">{vehicleNumber ? vehicleNumber : "Not Added Yet"}</span>
             </div>

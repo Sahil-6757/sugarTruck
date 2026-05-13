@@ -90,7 +90,7 @@ function Delivery() {
 
         {/* HEADER */}
         <div className="header">
-          <button className="back-btn" onClick={() => navigation('/farmer')} style={{ width: "auto" }}>
+          <button className="back-btn" onClick={() => navigation('/farmer')}>
             <FaArrowLeft /> Back
           </button>
 
@@ -110,7 +110,7 @@ function Delivery() {
                 <h3>Delivery #{data.deliveryId}</h3>
                 <p>{data.crop}</p>
               </div>
-              <span className="status">In Transit</span>
+              <span style={{ height: "fit-content" }} className="status">In Transit</span>
             </div>
 
             {/* OVERALL PROGRESS */}
@@ -134,7 +134,7 @@ function Delivery() {
                 <p className="small">Last updated: 1:45 PM</p>
               </div>
 
-              <button className="map-btn buttonHover" style={{ height: '2rem', width: "auto" }}>
+              <button className="map-btn buttonHover">
                 <FaMapMarkerAlt /> Live Map
               </button>
             </div>
@@ -198,7 +198,7 @@ function Delivery() {
                     {step.status === "pending" && <FaClock />}
                   </div>
 
-                  <div style={{ padding: "20px" }} className="content">
+                  <div className="content">
                     <div className="top">
                       <h4>{step.title}</h4>
                       <span>{step.time}</span>
