@@ -1022,6 +1022,7 @@ app.get("/admin/dashboard-stats", async (req, res) => {
 
 app.get("/admin/farmers", async (req, res) => {
   try {
+    await pool.query("SET SESSION group_concat_max_len = 1000000;");
     const { staffId } = req.query;
     let query = `
       SELECT 
@@ -1037,6 +1038,7 @@ app.get("/admin/farmers", async (req, res) => {
         GROUP_CONCAT(IFNULL(n.verification_notes, '') ORDER BY n.id) as v_notes,
         GROUP_CONCAT(IFNULL(n.verified_at, '') ORDER BY n.id) as v_dates,
         GROUP_CONCAT(IFNULL(n.verification_condition, '') ORDER BY n.id) as v_conditions,
+        GROUP_CONCAT(IFNULL(n.verification_image, '') ORDER BY n.id SEPARATOR '|||') as v_images,
         MAX(n.field_staff_id) as max_field_staff_id
       FROM users u
       LEFT JOIN nodani n ON u.id = n.farmer_id
@@ -1065,11 +1067,13 @@ app.get("/admin/farmers", async (req, res) => {
       const v_notes = row.v_notes ? row.v_notes.split(',') : [];
       const v_dates = row.v_dates ? row.v_dates.split(',') : [];
       const v_conditions = row.v_conditions ? row.v_conditions.split(',') : [];
+      const v_images = row.v_images ? row.v_images.split('|||') : [];
 
       let verifiedBy = null;
       let verificationNotes = null;
       let verifiedAt = null;
       let verificationCondition = null;
+      let verificationImage = null;
 
       if (statuses.includes('ready_for_delivery')) {
         status = "VERIFIED & READY";
@@ -1080,6 +1084,7 @@ app.get("/admin/farmers", async (req, res) => {
           verificationNotes = v_notes[idx] || null;
           verifiedAt = v_dates[idx] || null;
           verificationCondition = v_conditions[idx] || null;
+          verificationImage = v_images[idx] || null;
         }
       } else if (statuses.includes('declared')) {
         status = "HARVEST READY";
@@ -1118,7 +1123,8 @@ app.get("/admin/farmers", async (req, res) => {
         verifiedBy: verifiedBy,
         verificationNotes: verificationNotes,
         verifiedAt: verifiedAt,
-        verificationCondition: verificationCondition
+        verificationCondition: verificationCondition,
+        verificationImage: verificationImage
       };
     });
 

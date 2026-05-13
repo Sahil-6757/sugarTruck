@@ -998,6 +998,17 @@ function Farmeradminpanel() {
                           </p>
                         </div>
                       )}
+
+                      {selectedFarmerForView.verificationImage && (
+                        <div style={{ marginTop: '12px' }}>
+                          <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Field Evidence</p>
+                          <img
+                            src={selectedFarmerForView.verificationImage}
+                            alt="Field Verification"
+                            style={{ width: '100%', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'block' }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
