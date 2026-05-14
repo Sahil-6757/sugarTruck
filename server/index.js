@@ -1059,7 +1059,6 @@ app.get("/admin/farmers", async (req, res) => {
     const formattedFarmers = rows.map(row => {
       let status = "GROWING";
       let color = "blue";
-
       const statuses = row.harvest_statuses ? row.harvest_statuses.split(',') : [];
       const dates = row.plantation_dates ? row.plantation_dates.split(',') : [];
       const nod_ids = row.nod_ids ? row.nod_ids.split(',') : [];
