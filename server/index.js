@@ -659,7 +659,7 @@ app.post("/add-delivery", async (req, res) => {
 
 app.get("/get-deliveries", async (req, res) => {
   try {
-    const { staffId } = req.query;
+    const { staffId, farmerId } = req.query;
     let query = `SELECT d.* FROM deliveries d`;
     let params = [];
 
@@ -670,8 +670,19 @@ app.get("/get-deliveries", async (req, res) => {
         FROM deliveries d
         JOIN nodani n ON d.farmer_id = n.farmer_id
         WHERE n.field_staff_id = ?
+        ORDER BY d.created_at DESC
       `;
       params = [staffId];
+    } else if (farmerId) {
+      query = `
+        SELECT d.* 
+        FROM deliveries d
+        WHERE d.farmer_id = ?
+        ORDER BY d.created_at DESC
+      `;
+      params = [farmerId];
+    } else {
+      query += ` ORDER BY d.created_at DESC`;
     }
 
     const [rows] = await pool.query(query, params);

@@ -258,7 +258,8 @@
 }
 
 .content {
-  flex: 1;
+  max-width: 600px;
+  padding: 18px;
 }
 
 .top {
@@ -277,11 +278,7 @@
 }
 
 /* SIDE */
-.side {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+
 
 .big {
   font-size: 14px;

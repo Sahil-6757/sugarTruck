@@ -1,31 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import '../css/cropdetail.css'
-import { FaLeaf, FaMapMarkerAlt, FaCamera, FaCalendarAlt,FaCheckCircle,FaRegCircle, FaTint, FaBug } from "react-icons/fa";
+import { FaLeaf, FaMapMarkerAlt, FaCamera, FaCalendarAlt,FaCheckCircle,FaRegCircle, FaTint, FaBug, FaSeedling } from "react-icons/fa";
 import { MdOutlineAccessTime } from "react-icons/md";
 import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
 
 function Cropdetails() {
   const navigation = useNavigate();
-  const initialTasks = [
-    {
-      id: 1,
-      title: "Irrigation Due",
-      desc: "Field A needs watering in the next 24 hours",
-      priority: "High",
-      color: "blue",
-      icon: <FaTint />,
-    },
-    {
-      id: 2,
-      title: "Pest Monitoring",
-      desc: "Check signs of stem borer in north section",
-      priority: "Medium",
-      color: "orange",
-      icon: <FaBug />,
-    },
-  ];
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState([]);
+  const [timeline, setTimeline] = useState([]);
   const [data, setData] = useState({
     name: "Loading...",
     cropId: "",
@@ -69,6 +52,71 @@ function Cropdetails() {
             location: item.latitude ? `${item.latitude}, ${item.longitude}` : "Not tagged",
             progress: progress,
           });
+
+          // Generate dynamic timeline
+          const stagesConfig = [
+            { title: "Planting", desc: "Seed planting completed", daysFromStart: 0 },
+            { title: "Germination", desc: "Plants emerged successfully", daysFromStart: 10 },
+            { title: "Tillering", desc: "Active growth phase", daysFromStart: 61 },
+            { title: "Grand Growth", desc: "Rapid height increase", daysFromStart: 108 },
+            { title: "Maturation", desc: "Sugar accumulation phase", daysFromStart: 153 },
+            { title: "Harvest Ready", desc: "Ready for cutting", daysFromStart: 170 },
+          ];
+
+          let dynamicTimeline = stagesConfig.map(stage => {
+            let stageDate = new Date(plantedDate);
+            stageDate.setDate(stageDate.getDate() + stage.daysFromStart);
+            return {
+              title: stage.title,
+              desc: stage.desc,
+              dateObj: stageDate,
+              date: stageDate.toLocaleDateString('en-GB'),
+            };
+          });
+
+          let activeFound = false;
+          const todayStart = new Date(today);
+          todayStart.setHours(0,0,0,0);
+
+          for (let i = dynamicTimeline.length - 1; i >= 0; i--) {
+            const sDate = new Date(dynamicTimeline[i].dateObj);
+            sDate.setHours(0,0,0,0);
+
+            if (todayStart >= sDate) {
+              if (!activeFound && i !== dynamicTimeline.length - 1) {
+                 dynamicTimeline[i].status = "active";
+                 activeFound = true;
+              } else if (!activeFound && i === dynamicTimeline.length - 1) {
+                 dynamicTimeline[i].status = "done";
+                 activeFound = true;
+              } else {
+                 dynamicTimeline[i].status = "done";
+              }
+            } else {
+              dynamicTimeline[i].status = "pending";
+            }
+          }
+          if(!activeFound && dynamicTimeline.length > 0) {
+            dynamicTimeline[0].status = "active";
+          }
+          setTimeline(dynamicTimeline);
+
+          // Generate dynamic tasks
+          let dynamicTasks = [];
+          if (diffDays < 10) {
+             dynamicTasks.push({ id: 1, title: "Irrigation Schedule", desc: "Keep soil moist for germination", priority: "HIGH", color: "blue", icon: <FaTint /> });
+          } else if (diffDays >= 10 && diffDays < 60) {
+             dynamicTasks.push({ id: 1, title: "Irrigation Schedule", desc: "Next watering due in 2 days", priority: "MEDIUM", color: "blue", icon: <FaTint /> });
+             dynamicTasks.push({ id: 2, title: "Weed Control", desc: "Check for weeds in active growth phase", priority: "MEDIUM", color: "orange", icon: <FaLeaf /> });
+          } else if (diffDays >= 60 && diffDays < 150) {
+             dynamicTasks.push({ id: 1, title: "Irrigation Schedule", desc: "Next watering due in 2 days", priority: "MEDIUM", color: "blue", icon: <FaTint /> });
+             dynamicTasks.push({ id: 2, title: "Pest Inspection", desc: "Monthly pest control check overdue", priority: "HIGH", color: "red", icon: <FaBug /> });
+             dynamicTasks.push({ id: 3, title: "Fertilizer Application", desc: "Apply potassium fertilizer for sugar content", priority: "MEDIUM", color: "green", icon: <FaSeedling /> });
+          } else {
+             dynamicTasks.push({ id: 1, title: "Harvest Preparation", desc: "Check equipment and schedule labor", priority: "HIGH", color: "orange", icon: <FaCalendarAlt /> });
+             dynamicTasks.push({ id: 2, title: "Final Inspection", desc: "Assess crop maturity and sugar levels", priority: "MEDIUM", color: "green", icon: <FaLeaf /> });
+          }
+          setTasks(dynamicTasks);
         }
       } catch(err) {
         console.log(err);
@@ -78,44 +126,7 @@ function Cropdetails() {
   }, []);
   
 
-  const timelineData = [
-    {
-      title: "Planting",
-      desc: "Seed planting completed",
-      date: "3/15/2024",
-      status: "done",
-    },
-    {
-      title: "Germination",
-      desc: "Plants emerged successfully",
-      date: "3/25/2024",
-      status: "done",
-    },
-    {
-      title: "Tillering",
-      desc: "Active growth phase",
-      date: "5/15/2024",
-      status: "done",
-    },
-    {
-      title: "Grand Growth",
-      desc: "Rapid height increase",
-      date: "7/1/2024",
-      status: "done",
-    },
-    {
-      title: "Maturation",
-      desc: "Sugar accumulation phase",
-      date: "8/15/2024",
-      status: "active",
-    },
-    {
-      title: "Harvest Ready",
-      desc: "Ready for cutting",
-      date: "9/1/2024",
-      status: "pending",
-    },
-  ];
+
 
   const markDone = (id) => {
     setTasks(tasks.filter((task) => task.id !== id));
@@ -227,7 +238,7 @@ function Cropdetails() {
       <h3>Growth Timeline</h3>
 
       <div className="timeline">
-        {timelineData.map((item, index) => (
+        {timeline.map((item, index) => (
           <div className="timeline-item" key={index}>
 
             {/* LEFT ICON */}
@@ -244,7 +255,7 @@ function Cropdetails() {
             </div>
 
             {/* LINE */}
-            {index !== timelineData.length - 1 && (
+            {index !== timeline.length - 1 && (
               <div className="timeline-line"></div>
             )}
 
