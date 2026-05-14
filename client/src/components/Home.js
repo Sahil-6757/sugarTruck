@@ -61,7 +61,7 @@ function Home() {
 
             {/* Badge */}
             <div className="badge">
-              🌱 Farm to Factory Tracking
+              🌱 Farm to Factory Tracking sahil
             </div>
 
             {/* Title */}
