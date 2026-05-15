@@ -1,7 +1,9 @@
 import React from 'react';
 import Navbar from './Navbar'
-import { FaCheckCircle, FaMapMarkerAlt, FaPaperPlane, FaPhoneAlt, 
-  FaTruck, FaCube, FaFileAlt, FaCamera, FaClock } from 'react-icons/fa'
+import {
+  FaCheckCircle, FaMapMarkerAlt, FaPaperPlane, FaPhoneAlt,
+  FaTruck, FaCube, FaFileAlt, FaCamera, FaClock
+} from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/trip.css'
 
@@ -74,7 +76,7 @@ function Trip() {
 
         {/* Document Pickup */}
         <div className="drvDoc_section">
-          <h3 className="drvDoc_title">📷 Document Pickup</h3>
+          <h3 className="drvDoc_title">Document Pickup</h3>
 
           <div className="drvDoc_grid">
             <div className="drvDoc_item buttonHover">
