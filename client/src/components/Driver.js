@@ -37,6 +37,9 @@ function Driver() {
     vehicle: '',
   });
 
+  const [driverId, setDriverId] = React.useState(null);
+  const [deliveries, setDeliveries] = React.useState([]);
+
   const handleDriverChange = (e) => {
     const { name, value } = e.target;
     if (name === 'phone') {
@@ -79,6 +82,7 @@ function Driver() {
       if (response.data.length > 0) {
         const data = response.data[0];
         setVehicleNumber(data.vehicle_number);
+        setDriverId(data.id);
       }
 
     } catch (error) {
@@ -86,8 +90,18 @@ function Driver() {
     }
   };
 
+  const fetchDeliveries = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/get-deliveries");
+      setDeliveries(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   React.useEffect(() => {
     getDriversDetails();
+    fetchDeliveries();
   }, []);
 
   const handleDriverSubmit = async () => {
@@ -109,6 +123,16 @@ function Driver() {
     }
     handleClose();
   };
+
+  const myDeliveries = deliveries.filter(d => d.driver_id === driverId);
+  const todayStr = new Date().toISOString().split('T')[0];
+  const tripsToday = myDeliveries.filter(d => {
+    if (!d.delivery_date) return false;
+    return new Date(d.delivery_date).toISOString().split('T')[0] === todayStr;
+  });
+  const totalWeight = myDeliveries.reduce((acc, curr) => acc + (parseFloat(curr.weight) || 0), 0);
+  const distanceCovered = myDeliveries.length * 42; // Placeholder for distance
+  const earningsToday = tripsToday.length * 850; // Placeholder for earnings
 
   return (
     <>
@@ -134,7 +158,7 @@ function Driver() {
           <div className="drvDash_card">
             <div>
               <p className="drvDash_cardTitle">Today's Trips</p>
-              <h2 className="drvDash_cardValue">3</h2>
+              <h2 className="drvDash_cardValue">{tripsToday.length}</h2>
             </div>
             <FaTruck className="drvDash_icon" />
           </div>
@@ -142,7 +166,7 @@ function Driver() {
           <div className="drvDash_card">
             <div>
               <p className="drvDash_cardTitle">Distance Covered</p>
-              <h2 className="drvDash_cardValue">127 km</h2>
+              <h2 className="drvDash_cardValue">{distanceCovered} km</h2>
             </div>
             <FaMapMarkerAlt className="drvDash_icon" />
           </div>
@@ -150,7 +174,7 @@ function Driver() {
           <div className="drvDash_card">
             <div>
               <p className="drvDash_cardTitle">Total Weight</p>
-              <h2 className="drvDash_cardValue">98 tons</h2>
+              <h2 className="drvDash_cardValue">{totalWeight > 0 ? totalWeight.toFixed(2) : "0"} tons</h2>
             </div>
             <FaCube className="drvDash_icon" />
           </div>
@@ -158,7 +182,7 @@ function Driver() {
           <div className="drvDash_card">
             <div>
               <p className="drvDash_cardTitle">Earnings Today</p>
-              <h2 className="drvDash_cardValue">₹3,200</h2>
+              <h2 className="drvDash_cardValue">₹{earningsToday.toLocaleString('en-IN')}</h2>
             </div>
             <FaCheckCircle className="drvDash_icon" />
           </div>
@@ -170,67 +194,49 @@ function Driver() {
         <div className="drvAssign_section">
           <h2 className="drvAssign_title">Available Delivery Assignments</h2>
 
-          {/* Trip 1 */}
-          <div className="drvAssign_card">
-            <div className="drvAssign_left">
-              <div className="drvAssign_iconCircle">
-                <FaTruck />
-              </div>
+          {deliveries.filter(d => d.driver_id === driverId).length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#64748b', marginTop: '20px' }}>No deliveries assigned yet.</p>
+          ) : (
+            deliveries
+              .filter(d => d.driver_id === driverId)
+              .map((delivery, index) => (
+                <div className="drvAssign_card" key={delivery.id}>
+                  <div className="drvAssign_left">
+                    <div className="drvAssign_iconCircle">
+                      <FaTruck />
+                    </div>
 
-              <div>
-                <h3 className="drvAssign_tripId">Trip T001</h3>
-                <p className="drvAssign_info">
-                  Farmer: Suresh Patil
-                  <span className="drvAssign_meta">
-                    <FaMapMarkerAlt /> 25 km
-                  </span>
-                  <span className="drvAssign_meta">
-                    <FaClock /> 45 min
-                  </span>
-                </p>
-                <p className="drvAssign_subInfo">
-                  Pickup: Field A, Kolhapur <b>45 tons</b>
-                </p>
-              </div>
-            </div>
+                    <div>
+                      <h3 className="drvAssign_tripId">Trip DEL-{String(delivery.id).padStart(4, '0')}</h3>
+                      <p className="drvAssign_info">
+                        Farmer: {delivery.farmer_name}
+                        <span className="drvAssign_meta">
+                          <FaMapMarkerAlt /> 25 km
+                        </span>
+                        <span className="drvAssign_meta">
+                          <FaClock /> 45 min
+                        </span>
+                      </p>
+                      <p className="drvAssign_subInfo">
+                        Date: {new Date(delivery.delivery_date).toLocaleDateString()} <b>{delivery.delivery_time || 'N/A'}</b>
+                      </p>
+                    </div>
+                  </div>
 
-            <div className="drvAssign_right">
-              <span className="drvAssign_badgeAssigned">ASSIGNED</span>
-              <p className="drvAssign_time">Pickup: 14:00</p>
-              <button className="drvAssign_btnPrimary buttonHover" onClick={() => navigate('/trip')}>Start Trip</button>
-            </div>
-          </div>
-
-          {/* Trip 2 */}
-          <div className="drvAssign_card">
-            <div className="drvAssign_left">
-              <div className="drvAssign_iconCircle">
-                <FaTruck />
-              </div>
-
-              <div>
-                <h3 className="drvAssign_tripId">Trip T002</h3>
-                <p className="drvAssign_info">
-                  Farmer: Ramesh Jadhav
-                  <span className="drvAssign_meta">
-                    <FaMapMarkerAlt /> 32 km
-                  </span>
-                  <span className="drvAssign_meta">
-                    <FaClock /> 55 min
-                  </span>
-                </p>
-                <p className="drvAssign_subInfo">
-                  Pickup: Field B, Sangli <b>38 tons</b>
-                </p>
-              </div>
-            </div>
-
-            <div className="drvAssign_right">
-              <span className="drvAssign_badgeAvailable">AVAILABLE</span>
-              <p className="drvAssign_time">Pickup: 16:30</p>
-              <button className="drvAssign_btnSecondary buttonHover">Accept Trip</button>
-            </div>
-          </div>
+                  <div className="drvAssign_right">
+                    <span className={delivery.status === 'COMPLETED' ? "drvAssign_badgeAssigned" : "drvAssign_badgeAvailable"}>
+                      {delivery.status || 'SCHEDULED'}
+                    </span>
+                    <p className="drvAssign_time">Pickup: {delivery.delivery_time || 'N/A'}</p>
+                    {delivery.status !== 'COMPLETED' ? (
+                      <button className="drvAssign_btnPrimary buttonHover" onClick={() => navigate('/trip', { state: { delivery } })}>Start Trip</button>
+                    ) : (
+                      <button className="drvAssign_btnSecondary" disabled>Completed</button>
+                    )}
+                  </div>
+                </div>
+              ))
+          )}
         </div>
 
         {/* Bottom Action Cards */}

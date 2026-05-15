@@ -2,8 +2,14 @@ import React from 'react';
 import Navbar from './Navbar'
 import { FaCheckCircle, FaMapMarkerAlt, FaPaperPlane, FaPhoneAlt, 
   FaTruck, FaCube, FaFileAlt, FaCamera, FaClock } from 'react-icons/fa'
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/trip.css'
+
 function Trip() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const delivery = location.state?.delivery || {};
+
   return (
     <>
       <Navbar />
@@ -12,7 +18,7 @@ function Trip() {
         {/* Header */}
         <div className="drvTrip_header">
           <FaTruck className="drvTrip_headerIcon" />
-          <h2>Trip T001 - Active Delivery</h2>
+          <h2>Trip DEL-{String(delivery.id || 0).padStart(4, '0')} - Active Delivery</h2>
         </div>
 
         {/* Farmer Info */}
@@ -25,8 +31,8 @@ function Trip() {
           </div>
 
           <div className="drvTrip_farmerDetails">
-            <h3>Suresh Patil</h3>
-            <p>+91 9876543210</p>
+            <h3>{delivery.farmer_name || "Unknown Farmer"}</h3>
+            <p>+91 {delivery.farmer_phone || "9876543210"}</p>
           </div>
         </div>
 
@@ -98,10 +104,10 @@ function Trip() {
               <FaMapMarkerAlt /> Sugar Factory, Industrial Area
             </p>
             <p>
-              <FaClock /> ETA: 14:30
+              <FaClock /> ETA: {delivery.delivery_time || "14:30"}
             </p>
             <p>
-              <FaCube /> Expected: 45 tons
+              <FaCube /> Expected: {delivery.weight || "Pending"} tons
             </p>
           </div>
         </div>
